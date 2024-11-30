@@ -1,0 +1,66 @@
+# 기본 Unity 불필요 파일
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# JetBrains Rider
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# Visual Studio
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Gradle 및 Android 빌드 캐시
+.gradle/
+/[Bb]uild/[Aa]ndroid/
+/[Bb]uild/[Gg]radle/
+/[Aa]pp/[Bb]uild/
+
+# Android 빌드 파일
+*.apk
+*.aab
+*.aar
+*.so
+*.dbg.so
+*.dll
+
+# Unity 생성 파일
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Unity 크래시 리포트
+sysinfo.txt
+
+# Packed Addressables
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Unity Addressable 임시 파일
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# 기타 불필요 파일
+crashlytics-build.properties
+ExportedObj/
+.consulo/
+*.unitypackage
+*.app
