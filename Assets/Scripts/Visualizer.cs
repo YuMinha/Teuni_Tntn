@@ -30,6 +30,7 @@ public sealed class Visualizer : MonoBehaviour
     void Start()
     {
         StartCoroutine(WaitForCameraTexture());
+        
     }
 
     IEnumerator WaitForCameraTexture()
@@ -37,11 +38,10 @@ public sealed class Visualizer : MonoBehaviour
         while (!SharedCameraManager.IsInitialized)
         {
             Debug.Log("Waiting for SharedCameraManager to initialize...");
-            yield return null; // 한 프레임 대기
+            yield return null;
         }
 
         Debug.Log("SharedCameraManager initialized. Proceeding with Visualizer setup.");
-
         // Face detector initialization
         _detector = new FaceDetector(_resources);
 
@@ -52,12 +52,11 @@ public sealed class Visualizer : MonoBehaviour
         var sharedTexture = SharedCameraManager.CameraTexture;
         _gpuTexture = new RenderTexture(256, 256, 0);
 
-        isReady = true; // 준비 완료 상태로 설정
+        isReady = true;
     }
 
     void OnDestroy()
     {
-        // 리소스 해제
         _detector?.Dispose();
         if (_gpuTexture != null)
         {
@@ -68,10 +67,8 @@ public sealed class Visualizer : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!isReady)
-        {
-            return;
-        }
+        if (!isReady) return;
+
         var sharedTexture = SharedCameraManager.CameraTexture;
 
         if (sharedTexture == null)
@@ -79,28 +76,27 @@ public sealed class Visualizer : MonoBehaviour
             Debug.LogWarning("SharedCameraManager has no valid texture.");
             return;
         }
-
         Graphics.Blit(sharedTexture, _gpuTexture);
 
-        // BlazeFace 모델 처리
-        _detector.ProcessImage(_gpuTexture, _threshold);
+            _detector.ProcessImage(_gpuTexture, _threshold);
 
-        // Update markers
-        int i = 0;
-        foreach (var detection in _detector.Detections)
-        {
-            if (i == _markers.Length) break;
-            var marker = _markers[i++];
-            marker.detection = detection;
-            marker.gameObject.SetActive(true);
-        }
+            // Marker 업데이트
+            var i = 0;
+            foreach (var detection in _detector.Detections)
+            {
+                if (i == _markers.Length) break;
+                var marker = _markers[i++];
+                marker.detection = detection;
+                marker.gameObject.SetActive(true);
+            }
 
-        for (; i < _markers.Length; i++)
-            _markers[i].gameObject.SetActive(false);
+            for (; i < _markers.Length; i++)
+                _markers[i].gameObject.SetActive(false);
 
-        // UI에 GPU 텍스처 표시
-        _previewUI.texture = _gpuTexture;
+            // UI 업데이트
+            _previewUI.texture = _gpuTexture;
 
+        
         /*
         // Face detection
         _detector.ProcessImage(_source.Texture, _threshold);

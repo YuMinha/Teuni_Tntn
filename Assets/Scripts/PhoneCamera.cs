@@ -11,7 +11,7 @@ public class PhoneCamera : MonoBehaviour
     private WebCamTexture cameraTexture;
     private Texture bckgDefault;
     private static Texture2D boxOutlineTexture;
-    public GameObject rects;
+    //public GameObject rects;
 
     List<Color> colorTag = new List<Color>();
 
@@ -19,9 +19,10 @@ public class PhoneCamera : MonoBehaviour
     public AspectRatioFitter fit;
     public Yolov5Detector yolov5Detector;
     public GameObject boxContainer;
+    public GameObject panelUI;
     public GameObject boxPrefab;
     public GameObject background;
-    public TextMeshProUGUI text;
+    //public TextMeshProUGUI text;
 
     private int NETWORK_SIZE_X;
     private int NETWORK_SIZE_Y;
@@ -34,9 +35,10 @@ public class PhoneCamera : MonoBehaviour
     private float refreshTime = 1.0f;
     public float fps = 0.0f;
 
+    public GameObject startPanel;
+
     void Start()
     {
-        // Yolov5Detector 관련 설정
         NETWORK_SIZE_X = GameObject.Find("Detector").GetComponent<Yolov5Detector>().GetNewtorkX();
         NETWORK_SIZE_Y = GameObject.Find("Detector").GetComponent<Yolov5Detector>().GetNewtorkY();
         int CLASS_COUNT = GameObject.Find("Detector").GetComponent<Yolov5Detector>().GetClassCount();
@@ -48,25 +50,21 @@ public class PhoneCamera : MonoBehaviour
         }
 
         StartCoroutine(WaitForCameraTexture());
+
     }
 
     IEnumerator WaitForCameraTexture()
     {
-        while(!SharedCameraManager.IsInitialized)
+        while (!SharedCameraManager.IsInitialized)
         {
             yield return null;
         }
-
-        Debug.Log("CameraTexture 초기화");
-
         InitWithCameraTexture();
     }
 
     void InitWithCameraTexture()
     {
-        // SharedCameraManager의 CameraTexture 활용
         var sharedTexture = SharedCameraManager.CameraTexture;
-
         if (sharedTexture == null)
         {
             Debug.LogError("CameraTexture is not initialized in SharedCameraManager.");
@@ -74,23 +72,18 @@ public class PhoneCamera : MonoBehaviour
             return;
         }
 
-        // UI에 Texture 연결
         bckg.texture = sharedTexture;
-        Debug.Log("백그라운드에 shared 연결");
-
-        // 비율 조정 및 화면 설정
         float ratio_ = ((RectTransform)background.transform).rect.width / CAMERA_CAPTURE_X;
         boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
-
-        
 
         float ratio = 4f / 3f;
         fit.aspectRatio = ratio;
 
-        // 카메라 방향 설정
+        //float scaleY = cameraTexture.videoVerticallyMirrored ? -1f : 1f;
+        //bckg.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
+
         int orient = -((WebCamTexture)sharedTexture).videoRotationAngle;
         bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
-
         ResizeRectTransform();
         isCamera = true;
     }
@@ -110,8 +103,21 @@ public class PhoneCamera : MonoBehaviour
         rectTransform.sizeDelta = new Vector2(screenWidth, screenWidth / cameraAspect);
     }
 
-// Update is called once per frame
-void Update()
+    public void ActivateButton()
+    {
+        if (startPanel != null)
+        {
+            startPanel.gameObject.SetActive(true);
+
+        }
+        else
+        {
+            Debug.LogWarning("Target button is not assigned!");
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
     {
         if (!isCamera)
             return;
@@ -158,7 +164,6 @@ void Update()
         }));*/
 
         var sharedTexture = SharedCameraManager.CameraTexture;
-
         if (sharedTexture == null || !(sharedTexture is WebCamTexture webCamTexture))
         {
             Debug.LogWarning("Shared Camera Texture is not available or not a WebCamTexture.");
@@ -173,8 +178,19 @@ void Update()
 
                 foreach (Transform child in boxContainer.transform)
                 {
-                    Destroy(child.gameObject);
+                    if (child != null)
+                    {
+                        Destroy(child.gameObject);
+                    }
                 }
+
+                if (panelUI != null)
+                {
+                    panelUI.gameObject.SetActive(false);
+                }
+                ActivateButton();
+
+
 
                 for (int i = 0; i < boxes.Count; i++)
                 {
@@ -210,10 +226,10 @@ void Update()
             Debug.LogWarning("WebCamTexture is not playing.");
         }
 
-        CountFps();
+        //CountFps();
 
     }
-
+    /*
     private void CountFps()
     {
         if (timeCount < refreshTime)
@@ -229,5 +245,5 @@ void Update()
             framesCount = 0;
             timeCount = 0.0f;
         }
-    }
+    }*/
 }

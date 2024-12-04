@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Android;
 
@@ -37,9 +37,9 @@ public class SharedCameraManager : MonoBehaviour
         }
 
         WebCamDevice[] devices = WebCamTexture.devices;
+
         if (devices.Length > 0)
         {
-            // 전면 카메라 찾기
             foreach (var device in devices)
             {
                 if (device.isFrontFacing)
@@ -49,23 +49,19 @@ public class SharedCameraManager : MonoBehaviour
                 }
             }
 
-            // 전면 카메라가 없으면 첫 번째 카메라 사용
             if (_webCamTexture == null)
             {
                 Debug.LogWarning("No front-facing camera found. Using default camera.");
                 _webCamTexture = new WebCamTexture(devices[0].name);
             }
-
             _webCamTexture.Play();
-
-            // WebCamTexture가 초기화될 때까지 대기
             while (!_webCamTexture.didUpdateThisFrame)
             {
                 yield return null;
             }
 
             Debug.Log("WebCamTexture initialized successfully with front-facing camera.");
-            _isInitialized = true; // 초기화 완료 플래그 설정
+            _isInitialized = true;
         }
         else
         {
@@ -73,4 +69,3 @@ public class SharedCameraManager : MonoBehaviour
         }
     }
 }
-

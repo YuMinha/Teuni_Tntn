@@ -12,7 +12,6 @@ public class StartMenu : MonoBehaviour
     public Button StartBtn; //식사하기 버튼
     public Button TeuniBtn; //트니 키우기 창 이동 버튼
     public Slider HPbar; //트니 HP
-    public ARManager arManager;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +28,12 @@ public class StartMenu : MonoBehaviour
         // HP 변경 시 UI 자동 업데이트
         TeuniInven.HPChanged += UpdateHPBar;
 
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 
     void UpdateHPBar(int currentHP)
