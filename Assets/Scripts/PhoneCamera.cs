@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class PhoneCamera : MonoBehaviour
 {
-    private bool isCamera;
+    private bool isCamera = false;
     private WebCamTexture cameraTexture;
     private Texture bckgDefault;
     private static Texture2D boxOutlineTexture;
@@ -36,6 +36,7 @@ public class PhoneCamera : MonoBehaviour
 
     void Start()
     {
+        // Yolov5Detector 관련 설정
         NETWORK_SIZE_X = GameObject.Find("Detector").GetComponent<Yolov5Detector>().GetNewtorkX();
         NETWORK_SIZE_Y = GameObject.Find("Detector").GetComponent<Yolov5Detector>().GetNewtorkY();
         int CLASS_COUNT = GameObject.Find("Detector").GetComponent<Yolov5Detector>().GetClassCount();
@@ -46,50 +47,52 @@ public class PhoneCamera : MonoBehaviour
             colorTag.Add(randomColor);
         }
 
-        bckgDefault = bckg.texture;
-        WebCamDevice[] devices = WebCamTexture.devices;
+        StartCoroutine(WaitForCameraTexture());
+    }
 
-        if (devices.Length == 0)
+    IEnumerator WaitForCameraTexture()
+    {
+        while(!SharedCameraManager.IsInitialized)
         {
+            yield return null;
+        }
+
+        Debug.Log("CameraTexture 초기화");
+
+        InitWithCameraTexture();
+    }
+
+    void InitWithCameraTexture()
+    {
+        // SharedCameraManager의 CameraTexture 활용
+        var sharedTexture = SharedCameraManager.CameraTexture;
+
+        if (sharedTexture == null)
+        {
+            Debug.LogError("CameraTexture is not initialized in SharedCameraManager.");
             isCamera = false;
             return;
         }
 
-        for (int i = 0; i < devices.Length; i++)
-        {
-            if (devices[i].isFrontFacing)
-                cameraTexture = new WebCamTexture(devices[i].name, 1080, 1440);
-        }
+        // UI에 Texture 연결
+        bckg.texture = sharedTexture;
+        Debug.Log("백그라운드에 shared 연결");
 
-        if (cameraTexture == null)
-        {
-            if (devices.Length != 0)
-                cameraTexture = new WebCamTexture(devices[0].name, 1080, 1440);
-            else
-            {
-                isCamera = false;
-                return;
-            }
-
-        }
-
-        cameraTexture.Play();
-        bckg.texture = cameraTexture;
+        // 비율 조정 및 화면 설정
         float ratio_ = ((RectTransform)background.transform).rect.width / CAMERA_CAPTURE_X;
         boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
 
-        isCamera = true;
+        
 
         float ratio = 4f / 3f;
         fit.aspectRatio = ratio;
 
-        //float scaleY = cameraTexture.videoVerticallyMirrored ? -1f : 1f;
-        //bckg.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
-
-        int orient = -cameraTexture.videoRotationAngle;
+        // 카메라 방향 설정
+        int orient = -((WebCamTexture)sharedTexture).videoRotationAngle;
         bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
 
         ResizeRectTransform();
+        isCamera = true;
     }
 
     void ResizeRectTransform()
@@ -155,47 +158,57 @@ void Update()
         }));*/
 
         var sharedTexture = SharedCameraManager.CameraTexture;
-        if (sharedTexture == null) return;
 
-        WebCamTexture webCamTexture = (WebCamTexture)sharedTexture;
-
-        StartCoroutine(yolov5Detector.Detect(webCamTexture.GetPixels32(), webCamTexture.width, boxes =>
+        if (sharedTexture == null || !(sharedTexture is WebCamTexture webCamTexture))
         {
-            Resources.UnloadUnusedAssets();
+            Debug.LogWarning("Shared Camera Texture is not available or not a WebCamTexture.");
+            return;
+        }
 
-            foreach (Transform child in boxContainer.transform)
+        if (webCamTexture.isPlaying)
+        {
+            StartCoroutine(yolov5Detector.Detect(webCamTexture.GetPixels32(), webCamTexture.width, boxes =>
             {
-                Destroy(child.gameObject);
-            }
+                Resources.UnloadUnusedAssets();
 
-            for (int i = 0; i < boxes.Count; i++)
-            {
-                GameObject newBox = Instantiate(boxPrefab);
-                newBox.name = boxes[i].Label + " " + boxes[i].Confidence;
-                newBox.GetComponent<Image>().color = colorTag[boxes[i].LabelIdx];
-                newBox.transform.parent = boxContainer.transform;
-                newBox.transform.localPosition = new Vector3(boxes[i].Rect.x - NETWORK_SIZE_X / 2, boxes[i].Rect.y - NETWORK_SIZE_Y / 2);
-                newBox.transform.localScale = new Vector2(boxes[i].Rect.width / 100, boxes[i].Rect.height / 100);
-
-                bool text = true;
-                if (text)
+                foreach (Transform child in boxContainer.transform)
                 {
-                    GameObject labelText = new GameObject("LabelText");
-                    labelText.transform.parent = newBox.transform;
-                    labelText.transform.localPosition = Vector3.zero;
-                    Text label = labelText.AddComponent<Text>();
-                    label.text = boxes[i].Label + " " + boxes[i].Confidence.ToString("F3");
-                    label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    label.fontSize = 30;
-                    label.color = Color.white;
-                    label.alignment = TextAnchor.MiddleCenter;
-
-                    RectTransform labelRect = label.GetComponent<RectTransform>();
-                    Vector2 pivotOffset = new Vector2(0.5f, 0.5f) - newBox.GetComponent<RectTransform>().pivot;
-                    labelRect.localPosition = pivotOffset * newBox.GetComponent<RectTransform>().sizeDelta;
+                    Destroy(child.gameObject);
                 }
-            }
-        }));
+
+                for (int i = 0; i < boxes.Count; i++)
+                {
+                    GameObject newBox = Instantiate(boxPrefab);
+                    newBox.name = boxes[i].Label + " " + boxes[i].Confidence;
+                    newBox.GetComponent<Image>().color = colorTag[boxes[i].LabelIdx];
+                    newBox.transform.parent = boxContainer.transform;
+                    newBox.transform.localPosition = new Vector3(boxes[i].Rect.x - NETWORK_SIZE_X / 2, boxes[i].Rect.y - NETWORK_SIZE_Y / 2);
+                    newBox.transform.localScale = new Vector2(boxes[i].Rect.width / 100, boxes[i].Rect.height / 100);
+
+                    bool text = true;
+                    if (text)
+                    {
+                        GameObject labelText = new GameObject("LabelText");
+                        labelText.transform.parent = newBox.transform;
+                        labelText.transform.localPosition = Vector3.zero;
+                        Text label = labelText.AddComponent<Text>();
+                        label.text = boxes[i].Label + " " + boxes[i].Confidence.ToString("F3");
+                        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                        label.fontSize = 30;
+                        label.color = Color.white;
+                        label.alignment = TextAnchor.MiddleCenter;
+
+                        RectTransform labelRect = label.GetComponent<RectTransform>();
+                        Vector2 pivotOffset = new Vector2(0.5f, 0.5f) - newBox.GetComponent<RectTransform>().pivot;
+                        labelRect.localPosition = pivotOffset * newBox.GetComponent<RectTransform>().sizeDelta;
+                    }
+                }
+            }));
+        }
+        else
+        {
+            Debug.LogWarning("WebCamTexture is not playing.");
+        }
 
         CountFps();
 
