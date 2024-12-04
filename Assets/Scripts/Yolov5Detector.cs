@@ -15,8 +15,8 @@ namespace Assets.Scripts
         private string INPUT_NAME;
         private string OUTPUT_NAME;
 
-        private int NETWORK_SIZE_X = 416;
-        private int NETWORK_SIZE_Y = 416;
+        private int NETWORK_SIZE_X = 320;
+        private int NETWORK_SIZE_Y = 320;
 
         private int CLASS_COUNT = 40;
         private int OUTPUT_ROWS = 10647;

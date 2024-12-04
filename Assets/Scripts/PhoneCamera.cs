@@ -26,8 +26,8 @@ public class PhoneCamera : MonoBehaviour
     private int NETWORK_SIZE_X;
     private int NETWORK_SIZE_Y;
 
-    public int CAMERA_CAPTURE_X = 640;
-    public int CAMERA_CAPTURE_Y = 480;
+    public int CAMERA_CAPTURE_X = 1080;
+    public int CAMERA_CAPTURE_Y = 1440;
 
     private int framesCount = 0;
     private float timeCount = 0.0f;
@@ -57,14 +57,14 @@ public class PhoneCamera : MonoBehaviour
 
         for (int i = 0; i < devices.Length; i++)
         {
-            if (!devices[i].isFrontFacing)
-                cameraTexture = new WebCamTexture(devices[i].name, CAMERA_CAPTURE_X, CAMERA_CAPTURE_Y);
+            if (devices[i].isFrontFacing)
+                cameraTexture = new WebCamTexture(devices[i].name, 1080, 1440);
         }
 
         if (cameraTexture == null)
         {
             if (devices.Length != 0)
-                cameraTexture = new WebCamTexture(devices[0].name, CAMERA_CAPTURE_X, CAMERA_CAPTURE_Y);
+                cameraTexture = new WebCamTexture(devices[0].name, 1080, 1440);
             else
             {
                 isCamera = false;
@@ -75,27 +75,43 @@ public class PhoneCamera : MonoBehaviour
 
         cameraTexture.Play();
         bckg.texture = cameraTexture;
-        float ratio = ((RectTransform)background.transform).rect.width / CAMERA_CAPTURE_X;
-        boxContainer.transform.localScale = new Vector2(ratio, ratio);
+        float ratio_ = ((RectTransform)background.transform).rect.width / CAMERA_CAPTURE_X;
+        boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
 
         isCamera = true;
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!isCamera)
-            return;
-
-        float ratio = (float)cameraTexture.width / (float)cameraTexture.height;
+        float ratio = 4f / 3f;
         fit.aspectRatio = ratio;
 
-        float scaleY = cameraTexture.videoVerticallyMirrored ? -1f : 1f;
-        bckg.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
+        //float scaleY = cameraTexture.videoVerticallyMirrored ? -1f : 1f;
+        //bckg.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
 
         int orient = -cameraTexture.videoRotationAngle;
         bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
+
+        ResizeRectTransform();
+    }
+
+    void ResizeRectTransform()
+    {
+        // RectTransform 가져오기
+        RectTransform rectTransform = bckg.rectTransform;
+
+        // 디바이스 화면 가로 길이
+        float screenWidth = Screen.width;
+
+        // 카메라 비율 계산 (가로/세로)
+        float cameraAspect = 4f / 3f;
+
+        // 가로 길이를 디바이스의 가로 길이에 맞춤
+        rectTransform.sizeDelta = new Vector2(screenWidth, screenWidth / cameraAspect);
+    }
+
+// Update is called once per frame
+void Update()
+    {
+        if (!isCamera)
+            return;
 
         Texture texture = bckg.texture;
 
