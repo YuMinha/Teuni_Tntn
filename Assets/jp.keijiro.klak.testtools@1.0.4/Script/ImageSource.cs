@@ -19,17 +19,9 @@ public sealed class ImageSource : MonoBehaviour
     public enum SourceType { Texture, Video, Webcam, Card, Gradient }
     [SerializeField] SourceType _sourceType = SourceType.Card;
 
-    // Texture mode options
-    [SerializeField] Texture2D _texture = null;
-    [SerializeField] string _textureUrl = null;
-
-    // Video mode options
-    [SerializeField] VideoClip _video = null;
-    [SerializeField] string _videoUrl = null;
-
     // Webcam options
     [SerializeField] string _webcamName = "";
-    [SerializeField] Vector2Int _webcamResolution = new Vector2Int(1920, 1080);
+    [SerializeField] Vector2Int _webcamResolution = new Vector2Int(1080, 1440);
     [SerializeField] int _webcamFrameRate = 30;
 
     // Output options
@@ -82,39 +74,6 @@ public sealed class ImageSource : MonoBehaviour
             _buffer = new RenderTexture
               (_outputResolution.x, _outputResolution.y, 0);
 
-        // Create a material for the shader (only on Card and Gradient)
-        if (_sourceType == SourceType.Card || _sourceType == SourceType.Gradient)
-            _material = new Material(_shader);
-
-        // Texture source type:
-        // Blit a given texture, or download a texture from a given URL.
-        if (_sourceType == SourceType.Texture)
-        {
-            if (_texture != null)
-            {
-                Blit(_texture);
-            }
-            else
-            {
-                _webTexture = UnityWebRequestTexture.GetTexture(_textureUrl);
-                _webTexture.SendWebRequest();
-            }
-        }
-
-        // Video source type:
-        // Add a video player component and play a given video clip with it.
-        if (_sourceType == SourceType.Video)
-        {
-            var player = gameObject.AddComponent<VideoPlayer>();
-            player.source =
-              _video != null ? VideoSource.VideoClip : VideoSource.Url;
-            player.clip = _video;
-            player.url = _videoUrl;
-            player.isLooping = true;
-            player.renderMode = VideoRenderMode.APIOnly;
-            player.Play();
-        }
-
         // Webcam source type:
         // Create a WebCamTexture and start capturing.
         if (_sourceType == SourceType.Webcam)
@@ -125,14 +84,6 @@ public sealed class ImageSource : MonoBehaviour
             _webcam.Play();
         }
 
-        // Card source type:
-        // Run the card shader to generate a test card image.
-        if (_sourceType == SourceType.Card)
-        {
-            var dims = new Vector2(OutputBuffer.width, OutputBuffer.height);
-            _material.SetVector("_Resolution", dims);
-            Graphics.Blit(null, OutputBuffer, _material, 0);
-        }
     }
 
     void OnDestroy()
@@ -144,9 +95,6 @@ public sealed class ImageSource : MonoBehaviour
 
     void Update()
     {
-        if (_sourceType == SourceType.Video)
-            Blit(GetComponent<VideoPlayer>().texture);
-
         if (_sourceType == SourceType.Webcam && _webcam.didUpdateThisFrame)
             Blit(_webcam, _webcam.videoVerticallyMirrored);
 
@@ -160,8 +108,6 @@ public sealed class ImageSource : MonoBehaviour
             Destroy(texture);
         }
 
-        if (_sourceType == SourceType.Gradient)
-            Graphics.Blit(null, OutputBuffer, _material, 1);
     }
 
     #endregion

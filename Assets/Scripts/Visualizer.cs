@@ -39,6 +39,30 @@ public sealed class Visualizer : MonoBehaviour
 
     void LateUpdate()
     {
+        var sharedTexture = SharedCameraManager.CameraTexture;
+
+        if(sharedTexture != null)
+        {
+            _detector.ProcessImage(sharedTexture, _threshold);
+
+            // Marker 업데이트
+            var i = 0;
+            foreach (var detection in _detector.Detections)
+            {
+                if (i == _markers.Length) break;
+                var marker = _markers[i++];
+                marker.detection = detection;
+                marker.gameObject.SetActive(true);
+            }
+
+            for (; i < _markers.Length; i++)
+                _markers[i].gameObject.SetActive(false);
+
+            // UI 업데이트
+            _previewUI.texture = sharedTexture;
+
+        }
+        /*
         // Face detection
         _detector.ProcessImage(_source.Texture, _threshold);
 
@@ -57,7 +81,7 @@ public sealed class Visualizer : MonoBehaviour
             _markers[i].gameObject.SetActive(false);
 
         // UI update
-        _previewUI.texture = _source.Texture;
+        _previewUI.texture = _source.Texture;*/
     }
 
     #endregion
