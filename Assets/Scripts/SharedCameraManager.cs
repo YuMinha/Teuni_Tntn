@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class SharedCameraManager : MonoBehaviour
 {
     private static SharedCameraManager _instance;
     private WebCamTexture _webCamTexture;
+    private bool _isInitialized = false;
 
-    public static Texture CameraTexture => _instance._webCamTexture;
+    public static bool IsInitialized => _instance != null && _instance._isInitialized;
+    public static Texture CameraTexture => _instance?._webCamTexture;
 
     void Awake()
     {
@@ -19,31 +22,50 @@ public class SharedCameraManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(gameObject);
 
-        InitializeCamera();
+        StartCoroutine(InitializeCamera());
     }
 
-    private void InitializeCamera()
+    IEnumerator InitializeCamera()
     {
+        if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+        {
+            Permission.RequestUserPermission(Permission.Camera);
+            while (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+            {
+                yield return null;
+            }
+        }
+
         WebCamDevice[] devices = WebCamTexture.devices;
 
         if (devices.Length > 0)
         {
-            _webCamTexture = new WebCamTexture(devices[0].name);
+            foreach (var device in devices)
+            {
+                if (device.isFrontFacing)
+                {
+                    _webCamTexture = new WebCamTexture(device.name);
+                    break;
+                }
+            }
+
+            if (_webCamTexture == null)
+            {
+                Debug.LogWarning("No front-facing camera found. Using default camera.");
+                _webCamTexture = new WebCamTexture(devices[0].name);
+            }
             _webCamTexture.Play();
+            while (!_webCamTexture.didUpdateThisFrame)
+            {
+                yield return null;
+            }
+
+            Debug.Log("WebCamTexture initialized successfully with front-facing camera.");
+            _isInitialized = true;
         }
         else
         {
             Debug.LogError("No webcam detected.");
         }
-    }
-
-    public static Texture2D GetTexture2D()
-    {
-        if (_instance._webCamTexture == null) return null;
-
-        Texture2D texture = new Texture2D(_instance._webCamTexture.width, _instance._webCamTexture.height, TextureFormat.RGB24, false);
-        texture.SetPixels32(_instance._webCamTexture.GetPixels32());
-        texture.Apply();
-        return texture;
     }
 }
