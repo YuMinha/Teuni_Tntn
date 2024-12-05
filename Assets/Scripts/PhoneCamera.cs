@@ -110,53 +110,12 @@ public class PhoneCamera : MonoBehaviour
         // 가로 길이를 디바이스의 가로 길이에 맞춤
         rectTransform.sizeDelta = new Vector2(screenWidth, screenWidth / cameraAspect);
     }
-
-// Update is called once per frame
-void Update()
+    
+    // Update is called once per frame
+    void Update()
     {
         if (!isCamera)
             return;
-
-        /*Texture texture = bckg.texture;
-
-        WebCamTexture newTexture = (WebCamTexture)bckg.texture;
-        StartCoroutine(yolov5Detector.Detect(newTexture.GetPixels32(), newTexture.width, boxes =>
-        {
-            Resources.UnloadUnusedAssets();
-
-            foreach (Transform child in boxContainer.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
-            for (int i = 0; i < boxes.Count; i++)
-            {
-                GameObject newBox = Instantiate(boxPrefab);
-                newBox.name = boxes[i].Label + " " + boxes[i].Confidence;
-                newBox.GetComponent<Image>().color = colorTag[boxes[i].LabelIdx];
-                newBox.transform.parent = boxContainer.transform;
-                newBox.transform.localPosition = new Vector3(boxes[i].Rect.x - NETWORK_SIZE_X / 2, boxes[i].Rect.y - NETWORK_SIZE_Y / 2);
-                newBox.transform.localScale = new Vector2(boxes[i].Rect.width / 100, boxes[i].Rect.height / 100);
-
-                bool text = true;
-                if (text)
-                {
-                    GameObject labelText = new GameObject("LabelText");
-                    labelText.transform.parent = newBox.transform;
-                    labelText.transform.localPosition = Vector3.zero;
-                    Text label = labelText.AddComponent<Text>();
-                    label.text = boxes[i].Label + " " + boxes[i].Confidence.ToString("F3");
-                    label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    label.fontSize = 30;
-                    label.color = Color.white;
-                    label.alignment = TextAnchor.MiddleCenter;
-
-                    RectTransform labelRect = label.GetComponent<RectTransform>();
-                    Vector2 pivotOffset = new Vector2(0.5f, 0.5f) - newBox.GetComponent<RectTransform>().pivot;
-                    labelRect.localPosition = pivotOffset * newBox.GetComponent<RectTransform>().sizeDelta;
-                }
-            }
-        }));*/
 
         var sharedTexture = SharedCameraManager.CameraTexture;
         if (sharedTexture == null) return;
@@ -170,8 +129,6 @@ void Update()
                 LoadingPanel.SetActive(false);//로딩화면 비활성화
                 StartPanel.SetActive(true);//시작화면 활성화
             }
-            
-
             isLoadingComplete = true;
 
             Resources.UnloadUnusedAssets();
