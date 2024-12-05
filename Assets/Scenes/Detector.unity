@@ -1998,7 +1998,6 @@ MonoBehaviour:
   finishButton: {fileID: 1616800951}
   startPanel: {fileID: 626455054}
   script: {fileID: 0}
-  visualizescript: {fileID: 1554400159}
 --- !u!114 &1205386699
 MonoBehaviour:
   m_ObjectHideFlags: 0

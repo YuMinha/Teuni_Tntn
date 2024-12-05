@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Detector.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  m_configObjects: {}
+  m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 11be7355e4923f24e8a5dcff9e568510, type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 403a23d177356a04189704c4cf060171, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 6a058bf4131cbdd47878993b3df5c344, type: 2}
