@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1028,7 +1028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1760703bbd54c04488a8d10600262ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PlanePrefab: {fileID: 2035806414103723561, guid: 7577eb4612401ff41822f8ede5653aa7, type: 3}
+  m_PlanePrefab: {fileID: 2035806414103723561, guid: de5cbeb13e1e7ce4d95476a66be2f01f, type: 3}
   m_DetectionMode: 1
 --- !u!114 &2112907976
 MonoBehaviour:
@@ -1210,7 +1210,11 @@ PrefabInstance:
     - target: {fileID: 7967040871729822283, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
       propertyPath: TeuniInven
       value: 
-      objectReference: {fileID: 11400000, guid: 3cef99d933176254db8555176aa75604, type: 2}
+      objectReference: {fileID: 11400000, guid: 44a57daf6c867c545b924d5137e05a73, type: 2}
+    - target: {fileID: 7967040871729822283, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
+      propertyPath: TeuniHPSlider
+      value: 
+      objectReference: {fileID: 1247078276}
     - target: {fileID: 7967040871729822283, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
       propertyPath: foodImages.Array.data[0]
       value: 
