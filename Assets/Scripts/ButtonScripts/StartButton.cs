@@ -9,7 +9,6 @@ public class StartButton : MonoBehaviour
     public Button finishButton; // Finish 버튼
     public GameObject startPanel;
     public GameObject script; //먹는 거 인식 스크립트
-    public GameObject visualizescript; //Visualize 스크립트
 
     // Start is called before the first frame update
     void Start()
