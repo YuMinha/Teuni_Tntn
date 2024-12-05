@@ -9,7 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd49117bab405a641a0e6347378e8c94, type: 3}
+  m_Script: {fileID: 11500000, guid: e76e58d551c04d5499e7c136c59dde2d, type: 3}
   m_Name: TeuniInventory
   m_EditorClassIdentifier: 
-  hp: 100
+  MaxHp: 100
+  hp: 50
+  redCoin: 50
+  whiteCoin: 50
+  greenCoin: 50
+  yellowCoin: 50
+  redFood: 0
+  yellowFood: 0
+  greenFood: 0
+  whiteFood: 0
