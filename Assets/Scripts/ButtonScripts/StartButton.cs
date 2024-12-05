@@ -24,31 +24,21 @@ public class StartButton : MonoBehaviour
     // 버튼 상태를 전환하는 함수
     void ButtonStates()
     {
-        if (startPanel != null) //시작 판넬 비활성화
-        {
-            startPanel.gameObject.SetActive(false);
-
-        }
-
+        
         if (finishButton != null) //finish 버튼 생성
         {
             finishButton.gameObject.SetActive(true);
         }
-
-        if (visualizescript != null) //얼굴 인식 활성화
-        {
-            visualizescript.gameObject.SetActive(true);
-        }
-
+      
         if (script != null) //먹는 거 인식 활성화
         {
             script.gameObject.SetActive(true);
         }
-        // Start 버튼을 Canvas 계층 구조에서 맨 아래로 이동
-        if (startPanel != null)
+
+        if (startPanel != null) //시작 판넬 비활성화
         {
-            startPanel.transform.SetAsFirstSibling();
-            Debug.Log("Start button moved to the bottom of the Canvas.");
+            startPanel.gameObject.SetActive(false);
+
         }
     }
 }
