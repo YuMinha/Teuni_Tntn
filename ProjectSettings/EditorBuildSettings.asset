@@ -6,8 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/StartScene.unity
+    guid: 9aea14aa12936b24aa8efd024c8568f1
+  - enabled: 1
     path: Assets/Scenes/Detector.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/EatingScene.unity
+    guid: 639360b742c72bf4eb266e6bebb1d05c
+  - enabled: 1
+    path: Assets/Scenes/GrowingScene.unity
+    guid: 31b2fe57d22b9464a82f0c51a2e55b17
+  - enabled: 1
+    path: Assets/Scenes/SampleScene.unity
+    guid: b0e7cdaa1e5218447a9cb174bdc455aa
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 11be7355e4923f24e8a5dcff9e568510, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 403a23d177356a04189704c4cf060171, type: 2}
