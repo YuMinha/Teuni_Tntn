@@ -23,11 +23,6 @@ public class FinishButton : MonoBehaviour
     // 버튼 상태를 전환하는 함수
     void ButtonStates()
     {
-        if (script != null) //먹는 거 비활성화
-        {
-            script.enabled = false;
-        }
-        
         if (ResultPanel != null) //결과창 활성화
         {
             ResultPanel.gameObject.SetActive(true);
