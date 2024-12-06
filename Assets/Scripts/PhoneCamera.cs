@@ -3,15 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.UI;
 
 public class PhoneCamera : MonoBehaviour
 {
+    [SerializeField] private Visualizer _visualizer;
+    [SerializeField] private FoodNearHandler _foodNearHandler;
     private bool isCamera;
     private WebCamTexture cameraTexture;
     private Texture bckgDefault;
-    private static Texture2D boxOutlineTexture;
     //public GameObject rects;
+
+    private ObjectPool<GameObject> boxPool;
 
     List<Color> colorTag = new List<Color>();
 
@@ -26,8 +30,6 @@ public class PhoneCamera : MonoBehaviour
     private int NETWORK_SIZE_X;
     private int NETWORK_SIZE_Y;
 
-    public int CAMERA_CAPTURE_X = 1080;
-    public int CAMERA_CAPTURE_Y = 1440;
 
     private int framesCount = 0;
     private float timeCount = 0.0f;
@@ -50,10 +52,44 @@ public class PhoneCamera : MonoBehaviour
             colorTag.Add(randomColor);
         }
 
+        boxPool = new ObjectPool<GameObject>(
+            createFunc: CreateBoxObject,
+            actionOnGet: ActivateBox,
+            actionOnRelease: DeactivateBox,
+            actionOnDestroy: DestroyBox,
+            collectionCheck: false,
+            defaultCapacity: 10,
+            maxSize: 50
+        );
+
         bckgDefault = bckg.texture;
 
         StartCoroutine(WaitForSharedCamera());
     }
+
+    GameObject CreateBoxObject()
+    {
+        GameObject newBox = Instantiate(boxPrefab, boxContainer.transform);
+        newBox.SetActive(false);
+        
+        return newBox;
+    }
+
+    void ActivateBox(GameObject box)
+    {
+        box.SetActive(true);
+    }
+
+    void DeactivateBox(GameObject box)
+    {
+        box.SetActive(false);
+    }
+
+    void DestroyBox(GameObject box)
+    {
+        Destroy(box);
+    }
+
 
     IEnumerator WaitForSharedCamera()
     {
@@ -73,101 +109,119 @@ public class PhoneCamera : MonoBehaviour
             float ratio_ = ((RectTransform)background.transform).rect.width / 1080;
             boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
 
+            WebCamTexture webCamTexture = (WebCamTexture)sharedTexture;
+            int orient = -webCamTexture.videoRotationAngle;
+            bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
+
             ResizeRectTransform();
         }
     }
 
-        void ResizeRectTransform()
+    void ResizeRectTransform()
     {
+        float cameraAspect = 3f / 4f;
         RectTransform rectTransform = bckg.rectTransform;
         float screenWidth = Screen.width;
-        float cameraAspect = 4f / 3f;
+
+        fit.aspectRatio = cameraAspect;
         rectTransform.sizeDelta = new Vector2(screenWidth, screenWidth / cameraAspect);
     }
 
-// Update is called once per frame
-void Update()
-{
+
+    /*TODO
+     * 디텍션, 박스 초기화, 라벨 작업 다 따로 병렬화? 시키기
+     * Box UI 풀링 방식으로 바꾸기
+     */
+    void Update()
+    {
         if (!isCamera)
-    {
-        Debug.LogWarning("isCamera is false. Skipping Update.");
-        return;
-    }
+        {
+            Debug.LogWarning("isCamera is false. Skipping Update.");
+            return;
+        }
 
-    var sharedTexture = SharedCameraManager.CameraTexture;
+        var sharedTexture = SharedCameraManager.CameraTexture;
 
-    if (sharedTexture == null)
-    {
-        Debug.LogWarning("SharedCameraManager returned null for CameraTexture.");
-        return;
-    }
+        if (sharedTexture == null)
+        {
+            Debug.LogWarning("SharedCameraManager returned null for CameraTexture.");
+            return;
+        }
 
-    if (!(sharedTexture is WebCamTexture webCamTexture))
-    {
-        Debug.LogError("CameraTexture is not a WebCamTexture.");
-        return;
-    }
-        int orient = -webCamTexture.videoRotationAngle;
-        bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
+        if (!(sharedTexture is WebCamTexture webCamTexture))
+        {
+            Debug.LogError("CameraTexture is not a WebCamTexture.");
+            return;
+        }
 
         if (!webCamTexture.isPlaying)
-    {
-        Debug.LogWarning("WebCamTexture is not running.");
-        return;
-    }
-
-    //Debug.Log("WebCamTexture is ready and playing. Proceeding with detection.");
-
-        StartCoroutine(yolov5Detector.Detect(webCamTexture.GetPixels32(), webCamTexture.width, boxes =>
         {
-            if(isLoadingComplete == false)
-            {
-                LoadingPanel.SetActive(false);//로딩화면 비활성화
-                StartPanel.SetActive(true);//시작화면 활성화
-            }
-            
+            Debug.LogWarning("WebCamTexture is not running.");
+            return;
+        }
 
-            isLoadingComplete = true;
+        //Debug.Log("WebCamTexture is ready and playing. Proceeding with detection.");
 
-            Resources.UnloadUnusedAssets();
-
-
-            foreach (Transform child in boxContainer.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
-            for (int i = 0; i < boxes.Count; i++)
-            {
-                GameObject newBox = Instantiate(boxPrefab);
-                newBox.name = boxes[i].Label + " " + boxes[i].Confidence;
-                newBox.GetComponent<Image>().color = colorTag[boxes[i].LabelIdx];
-                newBox.transform.parent = boxContainer.transform;
-                newBox.transform.localPosition = new Vector3(boxes[i].Rect.x - NETWORK_SIZE_X / 2, boxes[i].Rect.y - NETWORK_SIZE_Y / 2);
-                newBox.transform.localScale = new Vector2(boxes[i].Rect.width / 100, boxes[i].Rect.height / 100);
-
-                bool text = true;
-                if (text)
-                {
-                    GameObject labelText = new GameObject("LabelText");
-                    labelText.transform.parent = newBox.transform;
-                    labelText.transform.localPosition = Vector3.zero;
-                    Text label = labelText.AddComponent<Text>();
-                    label.text = boxes[i].Label + " " + boxes[i].Confidence.ToString("F3");
-                    label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    label.fontSize = 30;
-                    label.color = Color.white;
-                    label.alignment = TextAnchor.MiddleCenter;
-
-                    RectTransform labelRect = label.GetComponent<RectTransform>();
-                    Vector2 pivotOffset = new Vector2(0.5f, 0.5f) - newBox.GetComponent<RectTransform>().pivot;
-                    labelRect.localPosition = pivotOffset * newBox.GetComponent<RectTransform>().sizeDelta;
-                }
-            }
-        }));
+        StartCoroutine(WaitForDetection(webCamTexture.GetPixels32(), webCamTexture.width));
 
         CountFps();
+    }
+    IEnumerator WaitForDetection(Color32[] pixels, int width)
+    {
+        yield return yolov5Detector.Detect(pixels, width, boxes =>
+        {
+            if (isLoadingComplete == false)
+            {
+                Debug.Log("디텍트 시작");
+                LoadingPanel.SetActive(false);//로딩화면 비활성화
+                StartPanel.SetActive(true);//시작화면 활성화
+                isLoadingComplete = true;
+            }
+            ProcessDetectionResults(boxes);
+        });
+    }
 
+    void ProcessDetectionResults(IList<BoundingBox> detectedBoxes)
+    {
+        foreach (Transform child in boxContainer.transform)
+        {
+            var box = child.gameObject;
+            if (boxPool != null)
+            {
+                boxPool.Release(box); // 풀로 반환
+            }
+            else
+            {
+                Destroy(box); // 풀이 없으면 직접 삭제
+            }
+        }
+        CheckFoodNearMouth(detectedBoxes);
+
+        StartCoroutine(UpdateUIBoxes(detectedBoxes));
+    }
+
+    IEnumerator UpdateUIBoxes(IList<BoundingBox> boxes)
+    {
+        foreach (var box in boxes)
+        {
+            GameObject newBox = boxPool.Get();
+            newBox.name = box.Label + " " + box.Confidence;
+            newBox.GetComponent<Image>().color = colorTag[box.LabelIdx];
+
+            newBox.transform.localPosition = new Vector3(box.Rect.x - NETWORK_SIZE_X / 2, box.Rect.y - NETWORK_SIZE_Y / 2);
+            newBox.transform.localScale = new Vector2(box.Rect.width / 100, box.Rect.height / 100);
+
+            TextMeshProUGUI label = newBox.GetComponentInChildren<TextMeshProUGUI>();
+            if (label != null)
+            {
+                label.text = $"{box.Label}\n{box.Confidence:F3}";
+            }
+            else
+            {
+                Debug.LogWarning("Label TextMeshProUGUI is missing in the pooled object!");
+            }
+            yield return null;
+        }
     }
 
     private void CountFps()
@@ -184,6 +238,49 @@ void Update()
             text.text = "FPS: " + fps;
             framesCount = 0;
             timeCount = 0.0f;
+        }
+    }
+
+    bool IsFoodNearMouth(Rect foodBox, Rect mouthArea)
+    {
+        var container = (RectTransform)boxContainer.transform;
+        Vector2 containerSize = container.sizeDelta;
+
+        //정규화 된 좌표였음
+        Rect mouthAReaInPixel = new Rect(
+            mouthArea.x * containerSize.x,
+            mouthArea.y * containerSize.y,
+            mouthArea.width * containerSize.x,
+            mouthArea.height * containerSize.y);
+
+        Vector2 foodCenter = new Vector2(
+            foodBox.x + foodBox.width / 2,
+            foodBox.y + foodBox.height / 2);
+
+        Debug.Log($"Food Center: {foodCenter}, Food Box: {foodBox}");
+        Debug.Log($"Mouth Area: {mouthAReaInPixel}");
+
+
+        return mouthAReaInPixel.Contains(foodCenter);
+    }
+
+    void CheckFoodNearMouth(IList<BoundingBox> foodDetections)
+    {
+        if (_visualizer == null || _visualizer.MouthArea == Rect.zero)
+        {
+            Debug.Log("입 인식 오류");
+            return;
+        }
+
+        Rect mouthArea = _visualizer.MouthArea;
+
+        foreach (var food in foodDetections)
+        {
+            if (IsFoodNearMouth(food.Rect, mouthArea))
+            {
+                Debug.Log($"{food.Label} 입 주변에 있음!!");
+                _foodNearHandler.EatFoodToGetCoins(food.Label);
+            }
         }
     }
 }

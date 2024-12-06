@@ -12,6 +12,9 @@ public sealed class Visualizer : MonoBehaviour
     [SerializeField, Range(0, 1)] float _threshold = 0.75f;
     [SerializeField] RawImage _previewUI = null;
     [SerializeField] Marker _markerPrefab = null;
+    [SerializeField] float foodDetectRange = 0.5f; // 얼굴 크기 기준 비율
+
+    public Rect MouthArea { get; private set; }
 
     #endregion
 
@@ -48,6 +51,7 @@ public sealed class Visualizer : MonoBehaviour
             // Face detection
             _detector.ProcessImage(_source.Texture, _threshold);
             UpdateMarkers();
+            UpdateMouthArea();
         }
         
 
@@ -72,5 +76,24 @@ public sealed class Visualizer : MonoBehaviour
             _markers[i].gameObject.SetActive(false);
     }
 
+    void UpdateMouthArea()
+    {
+        if (_detector.Detections.Length > 0)
+        {
+            var detection = _detector.Detections[0];
+            Vector2 mouthCenter = detection.mouth;
+            float mouthRadius = detection.extent.x * foodDetectRange;
+            MouthArea = new Rect(
+                mouthCenter.x - mouthRadius,
+                mouthCenter.y - mouthRadius,
+                mouthRadius * 2,
+                mouthRadius * 2
+            );
+        }
+        else
+        {
+            MouthArea = Rect.zero;
+        }
+    }
     #endregion
 }
