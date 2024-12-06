@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Unity.Barracuda;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Assets.Scripts
 {
@@ -75,17 +76,32 @@ namespace Assets.Scripts
 
         public IEnumerator Detect(Color32[] picture, int width, System.Action<IList<BoundingBox>> callback)
         {
-            using (var tensor = TransformInput(picture, NETWORK_SIZE_X, NETWORK_SIZE_Y, width))
+            Tensor tensor = null;
+            try
             {
-                var inputs = new Dictionary<string, Tensor>();
-                inputs.Add(INPUT_NAME, tensor);
+                tensor = TransformInput(picture, NETWORK_SIZE_X, NETWORK_SIZE_Y, width);
+                var inputs = new Dictionary<string, Tensor> { { INPUT_NAME, tensor } };
+
                 yield return StartCoroutine(worker.StartManualSchedule(inputs));
 
-                var output = worker.PeekOutput(OUTPUT_NAME);
-                OUTPUT_ROWS = output.kernelCount;
-                var results = ParseYoloV5Output(output, MINIMUM_CONFIDENCE);
-                var boxes = FilterBoundingBoxes(results, OBJECTS_LIMIT, MINIMUM_IOU_BBOX);
-                callback(boxes);
+                Tensor output = null;
+                try
+                {
+                    output = worker.PeekOutput(OUTPUT_NAME);
+                    OUTPUT_ROWS = output.kernelCount;
+
+                    var results = ParseYoloV5Output(output, MINIMUM_CONFIDENCE);
+                    var boxes = FilterBoundingBoxes(results, OBJECTS_LIMIT, MINIMUM_IOU_BBOX);
+                    callback(boxes);
+                }
+                finally
+                {
+                    output?.Dispose(); // Ensure output tensor is properly disposed
+                }
+            }
+            finally
+            {
+                tensor?.Dispose(); // Dispose input tensor
             }
         }
 
@@ -260,6 +276,11 @@ namespace Assets.Scripts
             var intersectionArea = Math.Max(maxY - minY, 0) * Math.Max(maxX - minX, 0);
 
             return intersectionArea / (areaA + areaB - intersectionArea);
+        }
+
+        private void OnDestroy()
+        {
+            worker?.Dispose(); // Ensure worker is disposed when the script is destroyed
         }
     }
 }

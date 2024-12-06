@@ -19,6 +19,8 @@ public sealed class Visualizer : MonoBehaviour
 
     FaceDetector _detector;
     Marker[] _markers = new Marker[16];
+    float _timeSinceLastUpdate = 0;
+    const float UpdateInterval = 0.1f; // 0.1초 간격
 
     #endregion
 
@@ -39,33 +41,22 @@ public sealed class Visualizer : MonoBehaviour
 
     void LateUpdate()
     {
-        var sharedTexture = SharedCameraManager.CameraTexture;
-
-        if(sharedTexture != null)
+        _timeSinceLastUpdate += Time.deltaTime;
+        if (_timeSinceLastUpdate >= UpdateInterval)
         {
-            _detector.ProcessImage(sharedTexture, _threshold);
-
-            // Marker 업데이트
-            var i = 0;
-            foreach (var detection in _detector.Detections)
-            {
-                if (i == _markers.Length) break;
-                var marker = _markers[i++];
-                marker.detection = detection;
-                marker.gameObject.SetActive(true);
-            }
-
-            for (; i < _markers.Length; i++)
-                _markers[i].gameObject.SetActive(false);
-
-            // UI 업데이트
-            _previewUI.texture = sharedTexture;
-
+            _timeSinceLastUpdate = 0;
+            // Face detection
+            _detector.ProcessImage(_source.Texture, _threshold);
+            UpdateMarkers();
         }
-        /*
-        // Face detection
-        _detector.ProcessImage(_source.Texture, _threshold);
+        
 
+        // UI update
+        _previewUI.texture = _source.Texture;
+    }
+
+    void UpdateMarkers()
+    {
         // Marker update
         var i = 0;
 
@@ -79,9 +70,6 @@ public sealed class Visualizer : MonoBehaviour
 
         for (; i < _markers.Length; i++)
             _markers[i].gameObject.SetActive(false);
-
-        // UI update
-        _previewUI.texture = _source.Texture;*/
     }
 
     #endregion

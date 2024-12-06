@@ -49,8 +49,18 @@ public sealed partial class FaceDetector : System.IDisposable
         var model = ModelLoader.Load(_resources.model);
         _size = model.inputs[0].GetTensorShape().GetWidth();
 
-        // GPU worker
-        _worker = model.CreateWorker(WorkerFactory.Device.GPU);
+            try
+            {
+                // GPU worker
+                _worker = model.CreateWorker(WorkerFactory.Device.GPU);
+                Debug.Log("Using GPU Worker");
+            }
+            catch
+            {
+                Debug.Log("GPU worker unavailable. to CPU");
+                _worker = model.CreateWorker(WorkerFactory.Device.CPU);
+            }
+        
 
         // Preprocess
         _preprocess = new ImagePreprocess(_size, _size);

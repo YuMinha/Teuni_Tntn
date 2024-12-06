@@ -11,7 +11,7 @@ public class PhoneCamera : MonoBehaviour
     private WebCamTexture cameraTexture;
     private Texture bckgDefault;
     private static Texture2D boxOutlineTexture;
-    public GameObject rects;
+    //public GameObject rects;
 
     List<Color> colorTag = new List<Color>();
 
@@ -51,117 +51,72 @@ public class PhoneCamera : MonoBehaviour
         }
 
         bckgDefault = bckg.texture;
-        WebCamDevice[] devices = WebCamTexture.devices;
 
-        if (devices.Length == 0)
-        {
-            isCamera = false;
-            return;
-        }
-
-        for (int i = 0; i < devices.Length; i++)
-        {
-            if (devices[i].isFrontFacing)
-                cameraTexture = new WebCamTexture(devices[i].name, 1080, 1440);
-        }
-
-        if (cameraTexture == null)
-        {
-            if (devices.Length != 0)
-                cameraTexture = new WebCamTexture(devices[0].name, 1080, 1440);
-            else
-            {
-                isCamera = false;
-                return;
-            }
-
-        }
-
-        cameraTexture.Play();
-        bckg.texture = cameraTexture;
-        float ratio_ = ((RectTransform)background.transform).rect.width / CAMERA_CAPTURE_X;
-        boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
-
-        isCamera = true;
-
-        float ratio = 4f / 3f;
-        fit.aspectRatio = ratio;
-
-        //float scaleY = cameraTexture.videoVerticallyMirrored ? -1f : 1f;
-        //bckg.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
-
-        int orient = -cameraTexture.videoRotationAngle;
-        bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
-
-        ResizeRectTransform();
+        StartCoroutine(WaitForSharedCamera());
     }
 
-    void ResizeRectTransform()
+    IEnumerator WaitForSharedCamera()
     {
-        // RectTransform 가져오기
+        while (!SharedCameraManager.IsInitialized)
+        {
+            Debug.Log("Waiting for SharedCameraManager to initialize...");
+            yield return null;
+        }
+
+        Debug.Log("SharedCameraManager initialized.");
+        isCamera = true;
+
+        var sharedTexture = SharedCameraManager.CameraTexture;
+        if (sharedTexture != null)
+        {
+            bckg.texture = sharedTexture;
+            float ratio_ = ((RectTransform)background.transform).rect.width / 1080;
+            boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
+
+            ResizeRectTransform();
+        }
+    }
+
+        void ResizeRectTransform()
+    {
         RectTransform rectTransform = bckg.rectTransform;
-
-        // 디바이스 화면 가로 길이
         float screenWidth = Screen.width;
-
-        // 카메라 비율 계산 (가로/세로)
         float cameraAspect = 4f / 3f;
-
-        // 가로 길이를 디바이스의 가로 길이에 맞춤
         rectTransform.sizeDelta = new Vector2(screenWidth, screenWidth / cameraAspect);
     }
 
 // Update is called once per frame
 void Update()
-    {
+{
         if (!isCamera)
-            return;
+    {
+        Debug.LogWarning("isCamera is false. Skipping Update.");
+        return;
+    }
 
-        /*Texture texture = bckg.texture;
+    var sharedTexture = SharedCameraManager.CameraTexture;
 
-        WebCamTexture newTexture = (WebCamTexture)bckg.texture;
-        StartCoroutine(yolov5Detector.Detect(newTexture.GetPixels32(), newTexture.width, boxes =>
-        {
-            Resources.UnloadUnusedAssets();
+    if (sharedTexture == null)
+    {
+        Debug.LogWarning("SharedCameraManager returned null for CameraTexture.");
+        return;
+    }
 
-            foreach (Transform child in boxContainer.transform)
-            {
-                Destroy(child.gameObject);
-            }
+    if (!(sharedTexture is WebCamTexture webCamTexture))
+    {
+        Debug.LogError("CameraTexture is not a WebCamTexture.");
+        return;
+    }
+        int orient = -webCamTexture.videoRotationAngle;
+        bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
 
-            for (int i = 0; i < boxes.Count; i++)
-            {
-                GameObject newBox = Instantiate(boxPrefab);
-                newBox.name = boxes[i].Label + " " + boxes[i].Confidence;
-                newBox.GetComponent<Image>().color = colorTag[boxes[i].LabelIdx];
-                newBox.transform.parent = boxContainer.transform;
-                newBox.transform.localPosition = new Vector3(boxes[i].Rect.x - NETWORK_SIZE_X / 2, boxes[i].Rect.y - NETWORK_SIZE_Y / 2);
-                newBox.transform.localScale = new Vector2(boxes[i].Rect.width / 100, boxes[i].Rect.height / 100);
+        if (!webCamTexture.isPlaying)
+    {
+        Debug.LogWarning("WebCamTexture is not running.");
+        return;
+    }
 
-                bool text = true;
-                if (text)
-                {
-                    GameObject labelText = new GameObject("LabelText");
-                    labelText.transform.parent = newBox.transform;
-                    labelText.transform.localPosition = Vector3.zero;
-                    Text label = labelText.AddComponent<Text>();
-                    label.text = boxes[i].Label + " " + boxes[i].Confidence.ToString("F3");
-                    label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                    label.fontSize = 30;
-                    label.color = Color.white;
-                    label.alignment = TextAnchor.MiddleCenter;
-
-                    RectTransform labelRect = label.GetComponent<RectTransform>();
-                    Vector2 pivotOffset = new Vector2(0.5f, 0.5f) - newBox.GetComponent<RectTransform>().pivot;
-                    labelRect.localPosition = pivotOffset * newBox.GetComponent<RectTransform>().sizeDelta;
-                }
-            }
-        }));*/
-
-        var sharedTexture = SharedCameraManager.CameraTexture;
-        if (sharedTexture == null) return;
-
-        WebCamTexture webCamTexture = (WebCamTexture)sharedTexture;
+    //Debug.Log("WebCamTexture is ready and playing. Proceeding with detection.");
 
         StartCoroutine(yolov5Detector.Detect(webCamTexture.GetPixels32(), webCamTexture.width, boxes =>
         {
