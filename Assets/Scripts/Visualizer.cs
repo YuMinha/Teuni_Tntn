@@ -19,6 +19,8 @@ public sealed class Visualizer : MonoBehaviour
 
     FaceDetector _detector;
     Marker[] _markers = new Marker[16];
+    float _timeSinceLastUpdate = 0;
+    const float UpdateInterval = 0.1f; 
 
     #endregion
 
@@ -39,9 +41,22 @@ public sealed class Visualizer : MonoBehaviour
 
     void LateUpdate()
     {
-        // Face detection
-        _detector.ProcessImage(_source.Texture, _threshold);
+        _timeSinceLastUpdate += Time.deltaTime;
+        if (_timeSinceLastUpdate >= UpdateInterval)
+        {
+            _timeSinceLastUpdate = 0;
+            // Face detection
+            _detector.ProcessImage(_source.Texture, _threshold);
+            UpdateMarkers();
+        }
 
+
+        // UI update
+        _previewUI.texture = _source.Texture;
+    }
+
+    void UpdateMarkers()
+    {
         // Marker update
         var i = 0;
 
@@ -55,9 +70,6 @@ public sealed class Visualizer : MonoBehaviour
 
         for (; i < _markers.Length; i++)
             _markers[i].gameObject.SetActive(false);
-
-        // UI update
-        _previewUI.texture = _source.Texture;
     }
 
     #endregion

@@ -17,7 +17,7 @@ namespace Klak.TestTools
         #region Editable attributes
         // Output options
         [SerializeField] RenderTexture _outputTexture = null;
-        [SerializeField] Vector2Int _outputResolution = new Vector2Int(1920, 1080);
+        [SerializeField] Vector2Int _outputResolution = new Vector2Int(256, 256);
 
         #endregion
 
@@ -75,9 +75,17 @@ namespace Klak.TestTools
                 Debug.Log("Waiting for SharedCam in Face");
                 yield return null;
             }
-            if (SharedCameraManager.CameraTexture == null)
+
+            var sharedTexture = SharedCameraManager.CameraTexture;
+            if (sharedTexture == null)
             {
                 Debug.LogError("SharedCameraManager returned null for CameraTexture.");
+                yield break;
+            }
+
+            if (!(sharedTexture is WebCamTexture))
+            {
+                Debug.LogError("SharedCameraManager returned an unsupported texture type.");
                 yield break;
             }
 
@@ -85,25 +93,43 @@ namespace Klak.TestTools
             _isInit = true;
         }
 
+        void OnDisable()
+        {
+            var sharedTexture = SharedCameraManager.CameraTexture as WebCamTexture;
+            if (sharedTexture != null)
+            {
+                sharedTexture.Stop();
+            }
+        }
+
+
         void OnDestroy()
         {
-            if (_buffer != null) Destroy(_buffer);
+            if (_buffer != null)
+            {
+                _buffer.Release();
+                Destroy(_buffer);
+            }
+
+            if (_outputTexture != null)
+            {
+                _outputTexture.Release();
+                Destroy(_outputTexture);
+            }
         }
 
         void Update()
         {
             if (!_isInit) return;
 
-            var sharedTexture = SharedCameraManager.CameraTexture;
-            if (sharedTexture == null) return;
-
-            if (sharedTexture == null || !(sharedTexture is WebCamTexture webCamTexture))
+            var sharedTexture = SharedCameraManager.CameraTexture as WebCamTexture;
+            if (sharedTexture == null)
             {
                 Debug.LogWarning("SharedCameraManager texture is not available or not a WebCamTexture.");
                 return;
             }
 
-            if (!webCamTexture.isPlaying)
+            if (!sharedTexture.isPlaying)
             {
                 Debug.LogWarning("WebCamTexture is not running. Ensure it is started properly.");
                 return;

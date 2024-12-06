@@ -11,7 +11,7 @@ public class PhoneCamera : MonoBehaviour
     private WebCamTexture cameraTexture;
     private Texture bckgDefault;
     private static Texture2D boxOutlineTexture;
-    public GameObject rects;
+    //public GameObject rects;
 
     List<Color> colorTag = new List<Color>();
 
@@ -51,84 +51,82 @@ public class PhoneCamera : MonoBehaviour
         }
 
         bckgDefault = bckg.texture;
-        WebCamDevice[] devices = WebCamTexture.devices;
 
-        if (devices.Length == 0)
+        StartCoroutine(WaitForSharedCamera());
+    }
+
+    IEnumerator WaitForSharedCamera()
+    {
+        while (!SharedCameraManager.IsInitialized)
         {
-            isCamera = false;
-            return;
+            Debug.Log("Waiting for SharedCameraManager to initialize...");
+            yield return null;
         }
 
-        for (int i = 0; i < devices.Length; i++)
-        {
-            if (devices[i].isFrontFacing)
-                cameraTexture = new WebCamTexture(devices[i].name, 1080, 1440);
-        }
-
-        if (cameraTexture == null)
-        {
-            if (devices.Length != 0)
-                cameraTexture = new WebCamTexture(devices[0].name, 1080, 1440);
-            else
-            {
-                isCamera = false;
-                return;
-            }
-
-        }
-
-        cameraTexture.Play();
-        bckg.texture = cameraTexture;
-        float ratio_ = ((RectTransform)background.transform).rect.width / CAMERA_CAPTURE_X;
-        boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
-
+        Debug.Log("SharedCameraManager initialized.");
         isCamera = true;
 
-        float ratio = 4f / 3f;
-        fit.aspectRatio = ratio;
+        var sharedTexture = SharedCameraManager.CameraTexture;
+        if (sharedTexture != null)
+        {
+            bckg.texture = sharedTexture;
+            float ratio_ = ((RectTransform)background.transform).rect.width / 1080;
+            boxContainer.transform.localScale = new Vector2(ratio_, ratio_);
 
-        //float scaleY = cameraTexture.videoVerticallyMirrored ? -1f : 1f;
-        //bckg.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
-
-        int orient = -cameraTexture.videoRotationAngle;
-        bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
-
-        ResizeRectTransform();
+            ResizeRectTransform();
+        }
     }
 
     void ResizeRectTransform()
     {
-        // RectTransform 가져오기
         RectTransform rectTransform = bckg.rectTransform;
-
-        // 디바이스 화면 가로 길이
         float screenWidth = Screen.width;
-
-        // 카메라 비율 계산 (가로/세로)
         float cameraAspect = 4f / 3f;
-
-        // 가로 길이를 디바이스의 가로 길이에 맞춤
         rectTransform.sizeDelta = new Vector2(screenWidth, screenWidth / cameraAspect);
     }
-    
+
     // Update is called once per frame
     void Update()
     {
         if (!isCamera)
+        {
+            Debug.LogWarning("isCamera is false. Skipping Update.");
             return;
+        }
 
         var sharedTexture = SharedCameraManager.CameraTexture;
-        if (sharedTexture == null) return;
 
-        WebCamTexture webCamTexture = (WebCamTexture)sharedTexture;
+        if (sharedTexture == null)
+        {
+            Debug.LogWarning("SharedCameraManager returned null for CameraTexture.");
+            return;
+        }
+
+        if (!(sharedTexture is WebCamTexture webCamTexture))
+        {
+            Debug.LogError("CameraTexture is not a WebCamTexture.");
+            return;
+        }
+        int orient = -webCamTexture.videoRotationAngle;
+        bckg.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
+
+        if (!webCamTexture.isPlaying)
+        {
+            Debug.LogWarning("WebCamTexture is not running.");
+            return;
+        }
+
+        //Debug.Log("WebCamTexture is ready and playing. Proceeding with detection.");
 
         StartCoroutine(yolov5Detector.Detect(webCamTexture.GetPixels32(), webCamTexture.width, boxes =>
         {
-            if(isLoadingComplete == false)
+            if (isLoadingComplete == false)
             {
                 LoadingPanel.SetActive(false);//로딩화면 비활성화
                 StartPanel.SetActive(true);//시작화면 활성화
             }
+
+
             isLoadingComplete = true;
 
             Resources.UnloadUnusedAssets();
