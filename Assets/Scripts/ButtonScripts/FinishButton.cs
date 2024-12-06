@@ -8,6 +8,7 @@ public class FinishButton : MonoBehaviour
     public Button finishButton; // Finish 버튼
     public FoodNearHandler foodNearHandler;
     public GameObject ResultPanel;//결과창
+    public AudioSource ButtonSound;//버튼 사운드
 
 
     // Start is called before the first frame update
@@ -22,6 +23,11 @@ public class FinishButton : MonoBehaviour
     // 버튼 상태를 전환하는 함수
     void ButtonStates()
     {
+        if (script != null) //먹는 거 비활성화
+        {
+            script.enabled = false;
+        }
+        
         if (ResultPanel != null) //결과창 활성화
         {
             ResultPanel.gameObject.SetActive(true);

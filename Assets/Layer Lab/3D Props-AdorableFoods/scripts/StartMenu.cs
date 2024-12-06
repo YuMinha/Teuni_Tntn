@@ -12,12 +12,14 @@ public class StartMenu : MonoBehaviour
     public Button StartBtn; //식사하기 버튼
     public Button TeuniBtn; //트니 키우기 창 이동 버튼
     public Slider HPbar; //트니 HP
+    public AudioSource ButtonSound;
 
     // Start is called before the first frame update
     void Start()
     {
-        StartBtn.onClick.AddListener(() => ChangeScene("Detector")); // 식사ar씬
-        TeuniBtn.onClick.AddListener(() => ChangeScene("GrowingScene")); //트니키우기씬
+        StartBtn.onClick.AddListener(() => ClickButton("Detector")); // 식사ar씬
+
+        TeuniBtn.onClick.AddListener(() => ClickButton("GrowingScene")); //트니키우기씬
         HPbar.onValueChanged.AddListener(OnHPValueChanged);
         //트니 HP 변경 시 UI 반영
 
@@ -28,6 +30,30 @@ public class StartMenu : MonoBehaviour
         // HP 변경 시 UI 자동 업데이트
         TeuniInven.HPChanged += UpdateHPBar;
 
+    }
+
+    public void ClickButton(string SceneName)
+    {
+        if (ButtonSound != null) //소리
+        {
+            ButtonSound.Play();
+        }
+
+        // 소리 재생 후 씬을 로드하도록 코루틴 호출
+        StartCoroutine(LoadSceneAfterSound(SceneName));
+    }
+
+    // 코루틴: 소리 재생이 끝난 후 씬 로드
+    private IEnumerator LoadSceneAfterSound(string SceneName)
+    {
+        if (ButtonSound != null)
+        {
+            // 소리의 길이만큼 대기
+            yield return new WaitForSeconds(ButtonSound.clip.length);
+        }
+
+        // 씬 로드
+        SceneManager.LoadScene(SceneName);
     }
 
     // Update is called once per frame

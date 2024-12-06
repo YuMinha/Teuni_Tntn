@@ -175,30 +175,10 @@ public class PhoneCamera : MonoBehaviour
                 Debug.Log("디텍트 시작");
                 LoadingPanel.SetActive(false);//로딩화면 비활성화
                 StartPanel.SetActive(true);//시작화면 활성화
-                isLoadingComplete = true;
             }
-            ProcessDetectionResults(boxes);
-        });
-    }
 
-    void ProcessDetectionResults(IList<BoundingBox> detectedBoxes)
-    {
-        foreach (Transform child in boxContainer.transform)
-        {
-            var box = child.gameObject;
-            if (boxPool != null)
-            {
-                boxPool.Release(box); // 풀로 반환
-            }
-            else
-            {
-                Destroy(box); // 풀이 없으면 직접 삭제
-            }
-        }
-        CheckFoodNearMouth(detectedBoxes);
 
-        StartCoroutine(UpdateUIBoxes(detectedBoxes));
-    }
+            isLoadingComplete = true;
 
     IEnumerator UpdateUIBoxes(IList<BoundingBox> boxes)
     {
