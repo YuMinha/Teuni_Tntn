@@ -56,7 +56,6 @@ public class PhoneCamera : MonoBehaviour
             createFunc: CreateBoxObject,
             actionOnGet: ActivateBox,
             actionOnRelease: DeactivateBox,
-            actionOnDestroy: DestroyBox,
             collectionCheck: false,
             defaultCapacity: 10,
             maxSize: 50
@@ -77,17 +76,27 @@ public class PhoneCamera : MonoBehaviour
 
     void ActivateBox(GameObject box)
     {
+        if (box == null)
+        {
+            Debug.LogError("Attempted to activate a null GameObject!");
+            return;
+        }
         box.SetActive(true);
     }
 
     void DeactivateBox(GameObject box)
     {
+        if (box == null)
+        {
+            Debug.LogError("Attempted to deactivate a null GameObject!");
+            return;
+        }
         box.SetActive(false);
-    }
-
-    void DestroyBox(GameObject box)
-    {
-        Destroy(box);
+        TextMeshProUGUI label = box.GetComponentInChildren<TextMeshProUGUI>();
+        if (label != null)
+        {
+            label.text = string.Empty; // 텍스트 초기화
+        }
     }
 
 
@@ -163,8 +172,6 @@ public class PhoneCamera : MonoBehaviour
         //Debug.Log("WebCamTexture is ready and playing. Proceeding with detection.");
 
         StartCoroutine(WaitForDetection(webCamTexture.GetPixels32(), webCamTexture.width));
-
-        CountFps();
     }
     IEnumerator WaitForDetection(Color32[] pixels, int width)
     {
@@ -175,16 +182,42 @@ public class PhoneCamera : MonoBehaviour
                 Debug.Log("디텍트 시작");
                 LoadingPanel.SetActive(false);//로딩화면 비활성화
                 StartPanel.SetActive(true);//시작화면 활성화
+                isLoadingComplete = true;
             }
+            ProcessDetectionResults(boxes);
+        });
+    }
 
+    void ProcessDetectionResults(IList<BoundingBox> detectedBoxes)
+    {
+        foreach (Transform child in boxContainer.transform)
+        {
+            if (child != null && child.gameObject != null)
+            {
+                boxPool.Release(child.gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("Attempted to release a destroyed object.");
+            }
+        }
 
-            isLoadingComplete = true;
+        CheckFoodNearMouth(detectedBoxes);
+
+        StartCoroutine(UpdateUIBoxes(detectedBoxes));
+    }
 
     IEnumerator UpdateUIBoxes(IList<BoundingBox> boxes)
     {
         foreach (var box in boxes)
         {
             GameObject newBox = boxPool.Get();
+            if (newBox == null)
+            {
+                Debug.LogWarning("ObjectPool returned a null GameObject!");
+                continue;
+            }
+
             newBox.name = box.Label + " " + box.Confidence;
             newBox.GetComponent<Image>().color = colorTag[box.LabelIdx];
 

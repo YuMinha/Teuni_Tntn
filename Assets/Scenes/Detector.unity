@@ -2512,6 +2512,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1beaf45955e33b43870e505bb8c437a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _visualizer: {fileID: 1554400160}
+  _foodNearHandler: {fileID: 1494246817}
   bckg: {fileID: 223974229}
   fit: {fileID: 223974228}
   yolov5Detector: {fileID: 40919615}
@@ -2519,8 +2521,6 @@ MonoBehaviour:
   boxPrefab: {fileID: 5347304568407062166, guid: efb33e49a6005c544b4a82223b9e2a13, type: 3}
   background: {fileID: 223974226}
   text: {fileID: 340184224}
-  CAMERA_CAPTURE_X: 1080
-  CAMERA_CAPTURE_Y: 1440
   fps: 0
   LoadingPanel: {fileID: 2017805698}
   StartPanel: {fileID: 626455054}
@@ -3639,6 +3639,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1478014864}
   m_CullTransparentMesh: 1
+--- !u!1 &1494246816
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1494246818}
+  - component: {fileID: 1494246817}
+  m_Layer: 0
+  m_Name: CoinHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1494246817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494246816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf79cd0eb732d644fbf2d483f779e0a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinIncrease: 3
+--- !u!4 &1494246818
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494246816}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 191.79538, y: 278.59155, z: -9.426559}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1503415534
 GameObject:
   m_ObjectHideFlags: 0
@@ -3827,6 +3872,7 @@ MonoBehaviour:
   _threshold: 0.612
   _previewUI: {fileID: 223974229}
   _markerPrefab: {fileID: 8350498522753284527, guid: 47a0fcd207399f14b8f37638653245e1, type: 3}
+  foodDetectRange: 0.5
 --- !u!4 &1554400161
 Transform:
   m_ObjectHideFlags: 0
@@ -4042,7 +4088,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   finishButton: {fileID: 1616800951}
-  script: {fileID: 0}
+  foodNearHandler: {fileID: 1494246817}
   ResultPanel: {fileID: 768674843}
   ButtonSound: {fileID: 358684789}
 --- !u!1 &1666743105
