@@ -55,6 +55,11 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private ARRaycastManager raycastManager;
     private GameObject selectedPrefab; // 현재 선택된 음식의 AR 프리팹
 
+    //소리 관련
+    public AudioSource ButtonSound;
+    public AudioSource CoinSound;
+    public AudioSource FoodSound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -98,6 +103,8 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         UpdateSlider(TeuniInven.hp);
     }
 
+
+
     void Update()
     {
         // 터치로 AR 오브젝트 이동
@@ -118,6 +125,8 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             feedButtonImage.sprite = foodImages[index];
             selectedPrefab = arObjectPrefabs[index];
+
+            FoodSound.Play();
         }
         else
         {
@@ -236,19 +245,23 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         }
     }
 
-    public void ChangeScene(string SceneName) 
+    public void ChangeSceneSound(string SceneName)
+    {
+        ButtonSound.Play();
+        // 소리 재생 후 씬을 로드하도록 코루틴 호출
+        StartCoroutine(ChangeScene(SceneName));
+    }
+    private IEnumerator ChangeScene(string SceneName) 
     //인스펙터에서 버튼 할당 X 버튼 onClick에서 함수 할당. 여러개의 HomeBtn에서 쓰기 위함
     {
-        SceneName = "SampleScene";
+        if(ButtonSound != null)
+        {
+            // 소리의 길이만큼 대기
+            yield return new WaitForSeconds(ButtonSound.clip.length);
+        }
 
-        if (!string.IsNullOrEmpty(SceneName))
-        {
-            SceneManager.LoadScene(SceneName);
-        }
-        else
-        {
-            Debug.LogError("Target scene name is not set!");
-        }
+        // 씬 로드
+        SceneManager.LoadScene(SceneName);
     }
 
     public void ChangeUI(GameObject targetUI)
@@ -263,6 +276,7 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         if (targetUI != null)
         {
             targetUI.SetActive(true);
+            ButtonSound.Play();
         }
         else
         {
@@ -329,6 +343,9 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 break;
         }
 
+        CoinSound.Play();
+
+
         UpdateUI();
     }
 
@@ -392,5 +409,5 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             TeuniHPSlider.value = currentHP;
         }
     }
-
+    
 }

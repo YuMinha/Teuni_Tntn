@@ -124,10 +124,9 @@ public class PhoneCamera : MonoBehaviour
             {
                 LoadingPanel.SetActive(false);//로딩화면 비활성화
                 StartPanel.SetActive(true);//시작화면 활성화
+
+                isLoadingComplete = true;
             }
-
-
-            isLoadingComplete = true;
 
             Resources.UnloadUnusedAssets();
 
