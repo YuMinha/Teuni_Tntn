@@ -2280,12 +2280,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40ff2e515a81541cbb664860588e2c6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _webcamName: LG Camera
-  _webcamResolution: {x: 1080, y: 1440}
-  _webcamFrameRate: 30
   _outputTexture: {fileID: 0}
   _outputResolution: {x: 1920, y: 1080}
-  _shader: {fileID: 4800000, guid: 3f7d8db4748f54c638a46cec0b0e61f8, type: 3}
 --- !u!4 &1427343745
 Transform:
   m_ObjectHideFlags: 0
