@@ -9,6 +9,19 @@ public class FoodTeaching : MonoBehaviour
 {
     public TeuniInven TeuniInven;
 
+    public Button CloseButton;
+    public GameObject TeachingUI;
+
+    private void Start()
+    {
+        CloseButton.onClick.AddListener(CloseUI);
+    }
+
+    private void CloseUI()
+    {
+        TeachingUI.gameObject.SetActive(false);
+    }
+    /*
     public Button HomeBtn; //홈 버튼
     public TextMeshProUGUI TeachingText;
     public Button NextBtn;
@@ -30,8 +43,8 @@ public class FoodTeaching : MonoBehaviour
         ExitBtn.onClick.AddListener(OnExitButtonClick);
 
         // 초기 설정
-        TeachingPrefab.SetActive(true);
-        TeachingText.text = TeachTextArray[TNum];
+        //TeachingPrefab.SetActive(true);
+        //TeachingText.text = TeachTextArray[TNum];
     }
 
     private void OnNextButtonClick()
@@ -57,5 +70,5 @@ public class FoodTeaching : MonoBehaviour
     public void LoadingScene()
     {
         SceneManager.LoadScene("StartScene");
-    }
+    }*/
 }
