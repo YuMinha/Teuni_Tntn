@@ -8,8 +8,10 @@ using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using EasyUI.Popup;
+//using Unity.VisualScripting;
 
-public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+public class GrowingUI : MonoBehaviour
 {
     public List<GameObject> uiElements; // 모든 UI를 관리할 리스트
                                         // 0. shop
@@ -42,7 +44,7 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     // Feed 버튼의 Image 컴포넌트
     private UnityEngine.UI.Image feedButtonImage;
 
-    // 이미지 배열 (Refri_food 버튼에 연결된 이미지들) -> 3D로 변경
+    // 이미지 배열 (Refri_food 버튼에 연결된 이미지들)
     public Sprite[] foodImages;
 
     private Vector3 originalPosition; // 버튼의 원래 위치
@@ -59,6 +61,15 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public AudioSource ButtonSound;
     public AudioSource CoinSound;
     public AudioSource FoodSound;
+    public AudioSource NOSound;
+
+    //게임 설명
+    private string[] TutorialText = { "이곳에서는 트니를 먹일 수 있어요.", "트니가 더러워지면 이곳에서 트니를 씻겨봐요."};
+    private string[] popupText = {"냉장고에서 트니에게 줄 음식을 선택하세요", "돈이 부족합니다!", "음식이 부족합니다!" };
+
+    public string FoodColor;
+
+    public Text DebugText;
 
     // Start is called before the first frame update
     void Start()
@@ -100,11 +111,16 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         // 원래 위치 저장
         originalPosition = feedButton.transform.position;
 
-        UpdateSlider(TeuniInven.hp);
+        TeuniInven.ResetData();
+        TeuniHPSlider.value = (float)TeuniInven.hp / (float)TeuniInven.MaxHp;
+        Debug.Log(TeuniInven.hp);
+        Debug.Log(TeuniInven.MaxHp);
+        Debug.Log((float)TeuniInven.hp / (float)TeuniInven.MaxHp);
+        Debug.Log(TeuniHPSlider.value);
+        //UpdateSlider(TeuniInven.hp);
     }
 
-
-
+    /*
     void Update()
     {
         // 터치로 AR 오브젝트 이동
@@ -117,15 +133,63 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             }
         }
     }
+    */
+
+    public void TestHpUp()
+    {
+        //TeuniInven.hp += 10;
+        //TeuniHPSlider.value = (float) TeuniInven.hp / 100f;
+        //UpdateSlider((int)TeuniInven.hp);
+        TeuniInven.UpdateHP(10);  //되는데???
+        Debug.Log(TeuniInven.hp);
+    }
 
     // 음식 선택 시 Feed 버튼 이미지 및 AR 프리팹 설정
     private void SelectFood(int index)
     {
         if (index >= 0 && index < foodImages.Length && index < arObjectPrefabs.Length)
         {
+            switch (index)
+            {
+                case 0:
+                    if(TeuniInven.redFood <= 0)
+                    {
+                        Debug.Log("Not Enought Food!");
+                        Popup.Show("음식이 부족합니다!");
+                        NOSound.Play();
+                        return;
+                    }
+                    break;
+                case 1:
+                    if (TeuniInven.greenFood <= 0)
+                    {
+                        Debug.Log("음식이 부족합니다!");
+                        Popup.Show("음식이 부족합니다!");
+                        NOSound.Play();
+                        return;
+                    }
+                    break;
+                case 2:
+                    if (TeuniInven.whiteFood <= 0)
+                    {
+                        Debug.Log("Not Enought Food!");
+                        Popup.Show("음식이 부족합니다!");
+                        NOSound.Play();
+                        return;
+                    }
+                    break;
+                case 3:
+                    if (TeuniInven.yellowFood <= 0)
+                    {
+                        Debug.Log("Not Enought Food!");
+                        Popup.Show("음식이 부족합니다!");
+                        NOSound.Play();
+                        return;
+                    }
+                    break;
+            }
             feedButtonImage.sprite = foodImages[index];
             selectedPrefab = arObjectPrefabs[index];
-
             FoodSound.Play();
         }
         else
@@ -170,25 +234,37 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 {
                     case 0: // Red Food
                         if (TeuniInven.redFood > 0)
+                        {
                             TeuniInven.redFood--;
+                            FoodColor = "Red";
+                        }
                         else
                             Debug.LogWarning("Not enough Red Food!");
                         break;
                     case 1: // green Food
                         if (TeuniInven.greenFood > 0)
+                        {
                             TeuniInven.greenFood--;
+                            FoodColor = "Green";
+                        }
                         else
                             Debug.LogWarning("Not enough Green Food!");
                         break;
                     case 2: // White Food
                         if (TeuniInven.whiteFood > 0)
+                        {
                             TeuniInven.whiteFood--;
+                            FoodColor = "White";
+                        }
                         else
                             Debug.LogWarning("Not enough White Food!");
                         break;
                     case 3: // Yellow Food
                         if (TeuniInven.yellowFood > 0)
+                        {
                             TeuniInven.yellowFood--;
+                            FoodColor = "Yellow";
+                        }
                         else
                             Debug.LogWarning("Not enough Yellow Food!");
                         break;
@@ -204,6 +280,7 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         Debug.LogError("Food sprite does not match any known food type!");
     }
 
+    /*
     void MoveObject(Touch touch)
     {
         Vector2 touchPosition = touch.position;
@@ -244,17 +321,22 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             transform.position = originalPosition;
         }
     }
+    */
 
+    //씬 전환할 때 소리나게 하려고 만듦
     public void ChangeSceneSound(string SceneName)
     {
         ButtonSound.Play();
         // 소리 재생 후 씬을 로드하도록 코루틴 호출
         StartCoroutine(ChangeScene(SceneName));
     }
-    private IEnumerator ChangeScene(string SceneName) 
+
+    private IEnumerator ChangeScene(string SceneName)
     //인스펙터에서 버튼 할당 X 버튼 onClick에서 함수 할당. 여러개의 HomeBtn에서 쓰기 위함
     {
-        if(ButtonSound != null)
+        SceneName = "SampleScene";
+
+        if (ButtonSound != null)
         {
             // 소리의 길이만큼 대기
             yield return new WaitForSeconds(ButtonSound.clip.length);
@@ -276,7 +358,7 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         if (targetUI != null)
         {
             targetUI.SetActive(true);
-            ButtonSound.Play();
+            ButtonSound.Play(); //버튼 소리
         }
         else
         {
@@ -295,10 +377,13 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 {
                     TeuniInven.redCoin -= 5;
                     TeuniInven.redFood += 1;
+                    CoinSound.Play();
                 }
                 else
                 {
                     Debug.Log("Not enough Red Coins!");
+                    Popup.Show("돈이 부족합니다!");
+                    NOSound.Play();
                 }
                 break;
 
@@ -307,10 +392,13 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 {
                     TeuniInven.yellowCoin -= 5;
                     TeuniInven.yellowFood += 1;
+                    CoinSound.Play();
                 }
                 else
                 {
                     Debug.Log("Not enough Yellow Coins!");
+                    Popup.Show("돈이 부족합니다!");
+                    NOSound.Play();
                 }
                 break;
 
@@ -319,10 +407,13 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 {
                     TeuniInven.greenCoin -= 5;
                     TeuniInven.greenFood += 1;
+                    CoinSound.Play();
                 }
                 else
                 {
                     Debug.Log("Not enough Green Coins!");
+                    Popup.Show("돈이 부족합니다!");
+                    NOSound.Play();
                 }
                 break;
 
@@ -331,10 +422,13 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 {
                     TeuniInven.whiteCoin -= 5;
                     TeuniInven.whiteFood += 1;
+                    CoinSound.Play();
                 }
                 else
                 {
                     Debug.Log("Not enough White Coins!");
+                    Popup.Show("돈이 부족합니다!");
+                    NOSound.Play();
                 }
                 break;
 
@@ -343,7 +437,6 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 break;
         }
 
-        CoinSound.Play();
 
 
         UpdateUI();
@@ -379,35 +472,20 @@ public class GrowingUI : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     private void OnEnable()
     {
+        
         if (TeuniInven != null)
         {
             // HP 변경 이벤트 구독
             TeuniInven.HPChanged += UpdateSlider;
         }
-
-        if (TeuniHPSlider != null && TeuniInven != null)
-        {
-            // 슬라이더 초기화
-            TeuniHPSlider.maxValue = TeuniInven.MaxHp;
-            TeuniHPSlider.value = TeuniInven.hp;
-        }
+        
     }
-
-    private void OnDisable()
-    {
-        if (TeuniInven != null)
-        {
-            // HP 변경 이벤트 구독 해제
-            TeuniInven.HPChanged -= UpdateSlider;
-        }
-    }
-
+    
     private void UpdateSlider(int currentHP)
     {
         if (TeuniHPSlider != null)
         {
-            TeuniHPSlider.value = currentHP;
+            TeuniHPSlider.value = currentHP / 100f;
         }
     }
-    
 }

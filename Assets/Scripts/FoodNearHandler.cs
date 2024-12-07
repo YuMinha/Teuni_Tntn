@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 /*{0: 'Green Vegetables', 1: 'Green bell pepper', 2: 'Red bell pepper',
  * 3: 'Yellow bell pepper', 4: 'broccoli', 5: 'cabbage', 6: 'carrot',
  * 7: 'cucumber', 8: 'kimchi', 9: 'lettuce', 10: 'mushroom', 11: 'onion',
@@ -9,6 +11,11 @@ using UnityEngine;
 public class FoodNearHandler : MonoBehaviour
 {
     [SerializeField] int coinIncrease = 3;
+
+    [SerializeField] TextMeshProUGUI greenCoinText; // Green Coin
+    [SerializeField] TextMeshProUGUI redCoinText;   // Red Coin
+    [SerializeField] TextMeshProUGUI yellowCoinText; // Yellow Coin
+    [SerializeField] TextMeshProUGUI whiteCoinText;  // White Coin
 
     private Dictionary<string, int> coinCounts = new Dictionary<string, int>();
     private Dictionary<string, List<string>> colorToClass = new Dictionary<string, List<string>>()
@@ -33,6 +40,8 @@ public class FoodNearHandler : MonoBehaviour
         //    Debug.Log($"color : {item.Key} ->  {item.Value}");
         //}
 
+        UpdateCoinUI(); //UI 초기화
+
     }
 
     public void EatFoodToGetCoins(string food)
@@ -49,6 +58,7 @@ public class FoodNearHandler : MonoBehaviour
                 eatenFoods.Add(food);
                 coinCounts[color] += coinIncrease; // 코인 증가량
                 Debug.Log($"Added {coinIncrease} {color} coin for {food}");
+                UpdateCoinUI();//코인 반영
                 return;
             }
         }
@@ -68,6 +78,14 @@ public class FoodNearHandler : MonoBehaviour
 
             Debug.Log($"{color}: {count} - Foods : [{classList}]");
         }
+    }
+    private void UpdateCoinUI()
+    {
+        // Coin 반영
+        greenCoinText.text = $"{coinCounts["Green"]}";
+        redCoinText.text = $"{coinCounts["Red"]}";
+        yellowCoinText.text = $"{coinCounts["Yellow"]}";
+        whiteCoinText.text = $"{coinCounts["White"]}";
     }
 
 

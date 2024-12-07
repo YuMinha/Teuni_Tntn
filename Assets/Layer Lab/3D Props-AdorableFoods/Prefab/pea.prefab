@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 2583236691964379367}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8967668437556496672}
@@ -122,6 +122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Eatting: {fileID: 4378390353765282173}
+  EatSound: {fileID: 8665152418537396525, guid: 4a3afd64898efc5408d2ad2528a759ca, type: 3}
 --- !u!1001 &1139537769764789803
 PrefabInstance:
   m_ObjectHideFlags: 0

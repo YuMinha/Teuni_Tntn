@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 359e370e3e20bc04fb8c397fd89c656b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Eatting: {instanceID: 0}
+  - TeuniInven: {fileID: 11400000, guid: 3cef99d933176254db8555176aa75604, type: 2}
+  - GrowingUI: {fileID: 7967040871729822283, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

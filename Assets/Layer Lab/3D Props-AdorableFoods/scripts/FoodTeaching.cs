@@ -12,49 +12,50 @@ public class FoodTeaching : MonoBehaviour
     public Button HomeBtn; //홈 버튼
     public TextMeshProUGUI TeachingText;
     public Button NextBtn;
-    //선생님 그림 클릭하면 창이 닫히거나 다음 텍스트가 나오게
+    public Button ExitBtn;
+
     public GameObject TeachingPrefab;
     private string[] TeachTextArray = { "테스트 텍스트", "녹색 음식을 먹으면 녹색 코인을 얻을 수 있습니다",
         "노란색 음식을 먹으면 노란색 코인을 얻을 수 있습니다", "빨간색 음식을 먹으면 빨간색 코인을 얻을 수 있습니다" };
-    public int TNum = 0;
+    private int TNum = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         HomeBtn.onClick.AddListener(LoadingScene); //시작 창으로 돌아감
+
+        // Next 버튼 이벤트 연결
+        NextBtn.onClick.AddListener(OnNextButtonClick);
+        // Exit 버튼 이벤트 연결
+        ExitBtn.onClick.AddListener(OnExitButtonClick);
+
+        // 초기 설정
         TeachingPrefab.SetActive(true);
-        NextBtn.onClick.AddListener(() => TextMethod(TNum));
-        //필요할 때만 학습 창 나오게 할 것임
-        TeachingText.text = TeachTextArray[0];
+        TeachingText.text = TeachTextArray[TNum];
     }
 
-    void TextMethod(int i)
+    private void OnNextButtonClick()
     {
-        if (i == 2)
+        TNum++;
+
+        if (TNum >= TeachTextArray.Length) // 텍스트 배열을 모두 보여주면 프리팹 비활성화
         {
             TeachingPrefab.SetActive(false);
-            i = 0;
+            TNum = 0; // 다시 시작할 경우를 대비해 초기화
         }
         else
         {
-            TeachingText.text = TeachTextArray[i];
-            i++;
+            TeachingText.text = TeachTextArray[TNum];
         }
+    }
+
+    private void OnExitButtonClick()
+    {
+        TeachingPrefab.SetActive(false);
     }
 
     public void LoadingScene()
     {
         SceneManager.LoadScene("StartScene");
-    }
-
-    void TMPUP()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

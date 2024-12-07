@@ -3669,6 +3669,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coinIncrease: 3
+  greenCoinText: {fileID: 916326432}
+  redCoinText: {fileID: 934274549}
+  yellowCoinText: {fileID: 275407178}
+  whiteCoinText: {fileID: 1267748409}
 --- !u!4 &1494246818
 Transform:
   m_ObjectHideFlags: 0
