@@ -48,7 +48,9 @@ public class FoodNearHandler : MonoBehaviour
     }
 
     public void EatFoodToGetCoins(string food)
-    {        
+    {
+        if (eatenFoods.Contains(food)) return;
+
         foreach (var _color in colorToClass)
         {
             string color = _color.Key;

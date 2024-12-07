@@ -334,7 +334,7 @@ public class GrowingUI : MonoBehaviour
     private IEnumerator ChangeScene(string SceneName)
     //인스펙터에서 버튼 할당 X 버튼 onClick에서 함수 할당. 여러개의 HomeBtn에서 쓰기 위함
     {
-        SceneName = "SampleScene";
+        SceneName = "StartScene";
 
         if (ButtonSound != null)
         {

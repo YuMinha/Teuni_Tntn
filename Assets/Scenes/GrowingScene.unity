@@ -1654,6 +1654,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: ChangeSceneSound
       objectReference: {fileID: 0}
+    - target: {fileID: 1280788556139317752, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: StartScene
+      objectReference: {fileID: 0}
     - target: {fileID: 2214384043608868732, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1669,6 +1673,10 @@ PrefabInstance:
     - target: {fileID: 7460752645744744422, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: ChangeSceneSound
+      objectReference: {fileID: 0}
+    - target: {fileID: 7460752645744744422, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: StartScene
       objectReference: {fileID: 0}
     - target: {fileID: 7967040871729822283, guid: 4f15d8df9170f8d48a6092c8a64c1b3c, type: 3}
       propertyPath: NOSound

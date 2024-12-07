@@ -34,7 +34,7 @@ public class PhoneCamera : MonoBehaviour
     private int framesCount = 0;
     private float timeCount = 0.0f;
     private float refreshTime = 1.0f;
-    public float fps = 0.0f;
+    
 
     public GameObject LoadingPanel; //로딩 화면
     public GameObject StartPanel; //시작 화면
@@ -234,23 +234,6 @@ public class PhoneCamera : MonoBehaviour
                 Debug.LogWarning("Label TextMeshProUGUI is missing in the pooled object!");
             }
             yield return null;
-        }
-    }
-
-    private void CountFps()
-    {
-        if (timeCount < refreshTime)
-        {
-            timeCount += Time.deltaTime;
-            framesCount += 1;
-        }
-        else
-        {
-            fps = (float)framesCount / timeCount;
-            // Debug.Log("FPS: " + fps);
-            text.text = "FPS: " + fps;
-            framesCount = 0;
-            timeCount = 0.0f;
         }
     }
 
