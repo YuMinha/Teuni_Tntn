@@ -38,7 +38,7 @@ public class SharedCameraManager : MonoBehaviour
             return;
         }
         _instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         StartCoroutine(InitializeCamera());
     }

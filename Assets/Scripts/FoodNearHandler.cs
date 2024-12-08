@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using EasyUI.Popup;
 
 /*{0: 'Green Vegetables', 1: 'Green bell pepper', 2: 'Red bell pepper',
  * 3: 'Yellow bell pepper', 4: 'broccoli', 5: 'cabbage', 6: 'carrot',
@@ -36,6 +37,12 @@ public class FoodNearHandler : MonoBehaviour
         foreach (var color in colorToClass.Keys)
         {
             coinCounts[color] = 0;
+        }
+
+        if (!TeuniManager.EatingSceneTutorial)
+        {
+            Popup.Show("식사 화면", "골고루 먹으면 다양한 코인을 얻을 수 있어요!");
+            TeuniManager.EatingSceneTutorial = true;
         }
 
         //foreach (KeyValuePair<string, int> item in coinCounts)
