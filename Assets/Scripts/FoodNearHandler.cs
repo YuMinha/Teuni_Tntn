@@ -95,7 +95,10 @@ public class FoodNearHandler : MonoBehaviour
     private void UpdateTeaching(string color)
     {
         // Teaching UI 활성화
-        TeachingPanel.gameObject.SetActive(true);
+        if (!TeachingPanel.gameObject.activeSelf)
+        {
+            TeachingPanel.gameObject.SetActive(true);
+        }
 
         // 색깔에 따른 메시지
         string message;
@@ -121,5 +124,18 @@ public class FoodNearHandler : MonoBehaviour
         }
 
         TeachingText.text = message; // TeachingText 업데이트
+
+        // 5초 후 TeachingPanel 비활성화
+        StopAllCoroutines(); // 이전에 실행된 코루틴이 있다면 중지
+        StartCoroutine(DeactivateTeachingPanel());
+    }
+
+    private IEnumerator DeactivateTeachingPanel()
+    {
+        yield return new WaitForSeconds(5f); //5초 대기
+        if (TeachingPanel.gameObject.activeSelf)
+        {
+            TeachingPanel.gameObject.SetActive(false); // 비활성화
+        }
     }
 }

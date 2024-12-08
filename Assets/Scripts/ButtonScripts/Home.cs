@@ -8,7 +8,7 @@ public class Home : MonoBehaviour
 {
     public Button homeButton;
     public AudioSource ButtonSound;//버튼 사운드
-    public void CameSceneControl()
+    public void GameSceneControl()
     {
         if (ButtonSound != null) //소리
         {
@@ -37,7 +37,7 @@ public class Home : MonoBehaviour
     {
         if (homeButton != null)
         {
-            homeButton.onClick.AddListener(CameSceneControl);
+            homeButton.onClick.AddListener(GameSceneControl);
         }
     }
 }

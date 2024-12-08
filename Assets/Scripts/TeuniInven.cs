@@ -37,7 +37,7 @@ public class TeuniInven : ScriptableObject
         whiteCoin = 50;
         greenCoin = 50;
         yellowCoin = 50;
-        
+
         redFood = 0;
         yellowFood = 0;
         greenFood = 0;
@@ -49,7 +49,7 @@ public class TeuniInven : ScriptableObject
         greenGauge = 0;
 
         lastUpdateTime = DateTime.Now;
-        Debug.Log("hp reset: "+hp);
+        Debug.Log("hp reset: " + hp);
     }
 
     public void UpdateHP(int delta)

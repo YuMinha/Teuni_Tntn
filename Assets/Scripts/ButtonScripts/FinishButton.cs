@@ -9,6 +9,8 @@ public class FinishButton : MonoBehaviour
     public FoodNearHandler foodNearHandler;
     public GameObject ResultPanel;//결과창
     public AudioSource ButtonSound;//버튼 사운드
+    public GameObject TeachingPanel; //FinishPane
+
 
 
     // Start is called before the first frame update
@@ -29,9 +31,13 @@ public class FinishButton : MonoBehaviour
             foodNearHandler.TotalAmountReceived();
         }
         
-        if (finishButton != null)
+        if (finishButton != null) //finishButton 비활성화
         {
             finishButton.gameObject.SetActive(false);
+        }
+        if(TeachingPanel != null && TeachingPanel.gameObject.activeSelf) //TeachingPanel 비활성화
+        {
+            TeachingPanel.gameObject.SetActive(false);
         }
     }
 }

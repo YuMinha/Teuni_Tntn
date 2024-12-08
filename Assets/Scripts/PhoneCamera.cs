@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PhoneCamera : MonoBehaviour
 {
@@ -28,13 +29,7 @@ public class PhoneCamera : MonoBehaviour
     public TextMeshProUGUI text;
 
     private int NETWORK_SIZE_X;
-    private int NETWORK_SIZE_Y;
-
-
-    private int framesCount = 0;
-    private float timeCount = 0.0f;
-    private float refreshTime = 1.0f;
-    
+    private int NETWORK_SIZE_Y;    
 
     public GameObject LoadingPanel; //로딩 화면
     public GameObject StartPanel; //시작 화면
@@ -65,6 +60,7 @@ public class PhoneCamera : MonoBehaviour
 
         StartCoroutine(WaitForSharedCamera());
     }
+
 
     GameObject CreateBoxObject()
     {
