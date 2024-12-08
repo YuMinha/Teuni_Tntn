@@ -134,6 +134,9 @@ public sealed partial class FaceDetector : System.IDisposable
 
         // Cache data invalidation
         _readCache.InvalidateCache();
+
+            _output.post1.SetCounterValue(0);
+            _output.post2.SetCounterValue(0);
     }
 
     #endregion

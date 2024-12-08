@@ -39,8 +39,17 @@ public sealed class Visualizer : MonoBehaviour
         //    _markers[i] = Instantiate(_markerPrefab, _previewUI.transform);
     }
 
-    void OnDestroy()
-      => _detector?.Dispose();
+    public void OnDestroy()
+    {
+        StopAllCoroutines();
+        if (_detector != null)
+        {
+            Debug.Log("FaceDetector Á¤¸® Áß...");
+            _detector.Dispose();
+            _detector = null;
+        }
+    }
+
 
     void LateUpdate()
     {

@@ -78,6 +78,11 @@ public class PhoneCamera : MonoBehaviour
             return;
         }
         box.SetActive(true);
+        TextMeshProUGUI label = box.GetComponentInChildren<TextMeshProUGUI>();
+        if (label != null)
+        {
+            label.text = string.Empty; // 텍스트 초기화
+        }
     }
 
     void DeactivateBox(GameObject box)
@@ -88,11 +93,6 @@ public class PhoneCamera : MonoBehaviour
             return;
         }
         box.SetActive(false);
-        TextMeshProUGUI label = box.GetComponentInChildren<TextMeshProUGUI>();
-        if (label != null)
-        {
-            label.text = string.Empty; // 텍스트 초기화
-        }
     }
 
 
@@ -277,14 +277,27 @@ public class PhoneCamera : MonoBehaviour
     }
     private void OnDestroy()
     {
+        StopAllCoroutines();
+
+        if (boxContainer == null)
+        {
+            Debug.LogWarning("boxContainer가 null입니다. 정리 작업을 건너뜁니다.");
+            return;
+        }
+
         foreach (Transform child in boxContainer.transform)
         {
-            if (child != null)
+            if (child != null && child.gameObject != null)
             {
-                Destroy(child.gameObject);
+                boxPool.Release(child.gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("이미 파괴된 GameObject를 건너뜁니다.");
             }
         }
 
         Debug.Log("bounding Box 객체 정리 완료.");
     }
+
 }

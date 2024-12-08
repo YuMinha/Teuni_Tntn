@@ -77,10 +77,14 @@ namespace Assets.Scripts
         public IEnumerator Detect(Color32[] picture, int width, System.Action<IList<BoundingBox>> callback)
         {
             Tensor tensor = null;
+            Dictionary<string, Tensor> inputs = null;
+
             try
             {
+                // Tensor 및 inputs 생성
                 tensor = TransformInput(picture, NETWORK_SIZE_X, NETWORK_SIZE_Y, width);
-                var inputs = new Dictionary<string, Tensor> { { INPUT_NAME, tensor } };
+                inputs = new Dictionary<string, Tensor> { { INPUT_NAME, tensor } };
+
 
                 yield return StartCoroutine(worker.StartManualSchedule(inputs));
 
@@ -98,15 +102,19 @@ namespace Assets.Scripts
                 {
                     if (output != null)
                     {
-                        output?.Dispose(); // Ensure output tensor is properly disposed
+                        output.Dispose(); // Ensure output tensor is properly disposed
                     }
                 }
             }
             finally
             {
-                if (tensor != null)
+                tensor?.Dispose();
+                if (inputs != null)
                 {
-                    tensor.Dispose();
+                    foreach (var input in inputs)
+                    {
+                        input.Value?.Dispose();
+                    }
                 }
             }
         }
@@ -116,7 +124,8 @@ namespace Assets.Scripts
             float[] floatValues = new float[width * height * 3];
             int beginning = (((pic.Length / requestedWidth) - height) * requestedWidth) / 2;
             int leftOffset = (requestedWidth - width) / 2;
-            for (int i = 0; i < height; i++)
+
+            System.Threading.Tasks.Parallel.For(0, height, i =>
             {
                 for (int j = 0; j < width; j++)
                 {
@@ -127,9 +136,11 @@ namespace Assets.Scripts
                     floatValues[(i * width + j) * 3 + 2] = (color.b - IMAGE_MEAN) / IMAGE_STD;
                 }
                 beginning += requestedWidth;
-            }
+            });
+
             return new Tensor(1, height, width, 3, floatValues);
         }
+
         private IList<BoundingBox> ParseYoloV5Output(Tensor tensor, float MINIMUM_CONFIDENCE)
         {
             var boxes = new List<BoundingBox>();
@@ -284,8 +295,9 @@ namespace Assets.Scripts
             return intersectionArea / (areaA + areaB - intersectionArea);
         }
 
-        void OnDestroy()
+        public void OnDestroy()
         {
+            StopAllCoroutines();
             if (worker != null)
             {
                 Debug.Log("욜로 Worker 정리 중...");
