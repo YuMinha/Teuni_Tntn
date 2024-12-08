@@ -38,7 +38,7 @@ public class SharedCameraManager : MonoBehaviour
             return;
         }
         _instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         StartCoroutine(InitializeCamera());
     }
@@ -89,6 +89,17 @@ public class SharedCameraManager : MonoBehaviour
         else
         {
             Debug.LogError("No webcam detected.");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if(_webCamTexture != null && _webCamTexture.isPlaying)
+        {
+            _isInitialized = false;
+            Debug.Log("À¥Ä· Á¤Áö Áß..");
+            _webCamTexture.Stop();
+            _webCamTexture = null;
         }
     }
 

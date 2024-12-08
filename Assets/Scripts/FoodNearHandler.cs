@@ -109,7 +109,8 @@ public class FoodNearHandler : MonoBehaviour
                 "Green" => "초록색 음식을 드셨네요! \n초록색 채소는 혈액순환을 촉진해줘요!",
                 "Red" => "빨간색 음식을 드셨네요! \n빨간색 채소는 몸속 염증을 줄여줘요!",
                 "Yellow" => "노란(주황)색 음식을 드셨네요! \n노란색 채소는 루테인과 제아잔틴이 많아서 눈을 보호해줘요!",
-                "White" => "하얀색 음식을 드셨네요! \n하얀색 채소는 면역력과 체온을 높여줘요!"
+                "White" => "하얀색 음식을 드셨네요! \n하얀색 채소는 면역력과 체온을 높여줘요!",
+                _ => throw new NotImplementedException()
             };
         }
         else // 이미 같은 색깔 음식을 먹은 적이 있을 때
@@ -119,7 +120,8 @@ public class FoodNearHandler : MonoBehaviour
                 "Green" => "초록색 음식을 드셨군요! 다른 색의 음식도 먹어볼까요?",
                 "Red" => "빨간색 음식을 드셨군요! 다른 색의 음식도 먹어볼까요?",
                 "Yellow" => "노란(주황)색 음식을 드셨군요! 다른 색의 음식도 먹어볼까요?",
-                "White" => "하얀색 음식을 드셨군요! 다른 색의 음식도 먹어볼까요?"
+                "White" => "하얀색 음식을 드셨군요! 다른 색의 음식도 먹어볼까요?",
+                _ => throw new NotImplementedException()
             };
         }
 

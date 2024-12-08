@@ -96,12 +96,18 @@ namespace Assets.Scripts
                 }
                 finally
                 {
-                    output?.Dispose(); // Ensure output tensor is properly disposed
+                    if (output != null)
+                    {
+                        output?.Dispose(); // Ensure output tensor is properly disposed
+                    }
                 }
             }
             finally
             {
-                tensor?.Dispose(); // Dispose input tensor
+                if (tensor != null)
+                {
+                    tensor.Dispose();
+                }
             }
         }
 
@@ -278,9 +284,15 @@ namespace Assets.Scripts
             return intersectionArea / (areaA + areaB - intersectionArea);
         }
 
-        private void OnDestroy()
+        void OnDestroy()
         {
-            worker?.Dispose(); // Ensure worker is disposed when the script is destroyed
+            if (worker != null)
+            {
+                Debug.Log("욜로 Worker 정리 중...");
+                worker?.Dispose();
+                worker = null;
+            }
         }
+
     }
 }

@@ -275,4 +275,16 @@ public class PhoneCamera : MonoBehaviour
             }
         }
     }
+    private void OnDestroy()
+    {
+        foreach (Transform child in boxContainer.transform)
+        {
+            if (child != null)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        Debug.Log("bounding Box 객체 정리 완료.");
+    }
 }
