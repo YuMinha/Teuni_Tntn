@@ -11,7 +11,7 @@ public sealed class Visualizer : MonoBehaviour
     [SerializeField] ResourceSet _resources = null;
     [SerializeField, Range(0, 1)] float _threshold = 0.75f;
     [SerializeField] RawImage _previewUI = null;
-    [SerializeField] Marker _markerPrefab = null;
+    //[SerializeField] Marker _markerPrefab = null;
     [SerializeField] float foodDetectRange = 0.5f; // 얼굴 크기 기준 비율
 
     public Rect MouthArea { get; private set; }
@@ -35,8 +35,8 @@ public sealed class Visualizer : MonoBehaviour
         _detector = new FaceDetector(_resources);
 
         // Marker population
-        for (var i = 0; i < _markers.Length; i++)
-            _markers[i] = Instantiate(_markerPrefab, _previewUI.transform);
+        //for (var i = 0; i < _markers.Length; i++)
+        //    _markers[i] = Instantiate(_markerPrefab, _previewUI.transform);
     }
 
     void OnDestroy()
@@ -61,19 +61,19 @@ public sealed class Visualizer : MonoBehaviour
 
     void UpdateMarkers()
     {
-        // Marker update
-        var i = 0;
+        //// Marker update
+        //var i = 0;
 
-        foreach (var detection in _detector.Detections)
-        {
-            if (i == _markers.Length) break;
-            var marker = _markers[i++];
-            marker.detection = detection;
-            marker.gameObject.SetActive(true);
-        }
+        //foreach (var detection in _detector.Detections)
+        //{
+        //    if (i == _markers.Length) break;
+        //    var marker = _markers[i++];
+        //    marker.detection = detection;
+        //    marker.gameObject.SetActive(true);
+        //}
 
-        for (; i < _markers.Length; i++)
-            _markers[i].gameObject.SetActive(false);
+        //for (; i < _markers.Length; i++)
+        //    _markers[i].gameObject.SetActive(false);
     }
 
     void UpdateMouthArea()
