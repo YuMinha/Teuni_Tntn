@@ -9,7 +9,7 @@ public sealed class Visualizer : MonoBehaviour
 
     [SerializeField] ImageSource _source = null;
     [SerializeField] ResourceSet _resources = null;
-    [SerializeField, Range(0, 1)] float _threshold = 0.75f;
+    [SerializeField, Range(0, 1)] float _threshold = 0.5f;
     [SerializeField] RawImage _previewUI = null;
     //[SerializeField] Marker _markerPrefab = null;
     [SerializeField] float foodDetectRange = 0.5f; // 얼굴 크기 기준 비율

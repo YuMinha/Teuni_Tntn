@@ -245,36 +245,50 @@ public class PhoneCamera : MonoBehaviour
             mouthArea.width * containerSize.x,
             mouthArea.height * containerSize.y);
 
-        Vector2 foodCenter = new Vector2(
-            foodBox.x + foodBox.width / 2,
-            foodBox.y + foodBox.height / 2);
+        Rect expandedMouthArea = new Rect(
+        mouthAReaInPixel.x - 10, // 좌측 확장
+        mouthAReaInPixel.y - 10, // 상단 확장
+        mouthAReaInPixel.width + 20, // 너비 확장
+        mouthAReaInPixel.height + 20 // 높이 확장
+    );
 
-        Debug.Log($"Food Center: {foodCenter}, Food Box: {foodBox}");
-        Debug.Log($"Mouth Area: {mouthAReaInPixel}");
+        Debug.Log($"Expanded Mouth Area: {expandedMouthArea}");
+        Debug.Log($"Food Box: {foodBox}");
 
 
-        return mouthAReaInPixel.Contains(foodCenter);
+        return expandedMouthArea.Overlaps(foodBox);
     }
 
     void CheckFoodNearMouth(IList<BoundingBox> foodDetections)
     {
-        if (_visualizer == null || _visualizer.MouthArea == Rect.zero)
+        if (_visualizer == null)
         {
-            Debug.Log("입 인식 오류");
+            Debug.LogError("Visualizer가 null입니다.");
             return;
         }
 
+        // 얼굴 탐지 실패 시 이전 영역 유지
         Rect mouthArea = _visualizer.MouthArea;
+        if (mouthArea == Rect.zero)
+        {
+            Debug.LogWarning("입 인식 실패. 이전 MouthArea 유지.");
+            return;
+        }
 
         foreach (var food in foodDetections)
         {
             if (IsFoodNearMouth(food.Rect, mouthArea))
             {
-                Debug.Log($"{food.Label} 입 주변에 있음!!");
+                Debug.Log($"{food.Label}이(가) 입 주변에 있습니다!");
                 _foodNearHandler.EatFoodToGetCoins(food.Label);
+            }
+            else
+            {
+                Debug.Log($"{food.Label}이(가) 입 근처에 없습니다.");
             }
         }
     }
+
     private void OnDestroy()
     {
         StopAllCoroutines();
