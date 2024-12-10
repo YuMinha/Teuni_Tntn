@@ -3924,7 +3924,6 @@ MonoBehaviour:
   _resources: {fileID: 11400000, guid: 5594fd2934aca864980b90fe058f4161, type: 2}
   _threshold: 0.612
   _previewUI: {fileID: 223974229}
-  _markerPrefab: {fileID: 8350498522753284527, guid: 47a0fcd207399f14b8f37638653245e1, type: 3}
   foodDetectRange: 0.5
 --- !u!4 &1554400161
 Transform:
@@ -4080,6 +4079,7 @@ MonoBehaviour:
   foodNearHandler: {fileID: 1494246817}
   ResultPanel: {fileID: 768674843}
   ButtonSound: {fileID: 358684789}
+  TeachingPanel: {fileID: 738077834}
 --- !u!1 &1666743105
 GameObject:
   m_ObjectHideFlags: 0
