@@ -24,9 +24,9 @@ public class FoodNearHandler : MonoBehaviour
     public static Dictionary<string, int> coinCounts = new Dictionary<string, int>();
     private Dictionary<string, List<string>> colorToClass = new Dictionary<string, List<string>>()
     {
-        {"Green", new List<string>{ "Green Vegetables", "Green bell pepper", "broccoli", "lettuce", "spinach", "spring onion" } },
+        {"Green", new List<string>{ "Green Vegetables", "Green bell pepper", "broccoli", "lettuce", "spinach", "spring onion", "cucumber" } },
         {"Red", new List<string>{ "Red bell pepper", "kimchi", "tomato" } },
-        {"Yellow", new List<string>{ "Yellow bell peppe", "carrot", "cucumber", "pumpkin" } },
+        {"Yellow", new List<string>{ "Yellow bell peppe", "carrot", "pumpkin" } },
         {"White", new List<string>{ "cabbage", "mushroom", "onion", "radish" } }
     };
 

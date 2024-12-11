@@ -370,7 +370,7 @@ MonoBehaviour:
   MINIMUM_CONFIDENCE: 0.6
   MINIMUM_IOU_BBOX: 0.45
   OBJECTS_LIMIT: 20
-  modelFile: {fileID: 5022602860645237092, guid: 73e25bfca53888f4e919ee786d93feae, type: 3}
+  modelFile: {fileID: 5022602860645237092, guid: 539b138532a66e848bbc66d1fa66a83d, type: 3}
 --- !u!4 &40919616
 Transform:
   m_ObjectHideFlags: 0
