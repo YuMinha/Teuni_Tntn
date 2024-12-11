@@ -36,6 +36,15 @@
 ## 📚 개발 배경
 ![image](https://github.com/user-attachments/assets/5e05fcff-8047-49e9-9b10-6ff78f541a51)
 
+**점점 늘어나는 영양 결핍**
+
+
+영양 결핍이 야기하는 문제
+
+- 피로, 무기력증, 과민성 혹은 무관심 등 정신 질환 발생 가능성 증가
+- 치매 혹은 섬망 발생 가능성 증가
+- 어린 아이의 경우, 행동 발달이 늦어짐 혹은 지적 장애 발생 가능성 증가
+
 
 ## 🔘 전체 시스템 구성
 ![image](https://github.com/user-attachments/assets/857cf482-1227-48ea-9ed0-0b7be5ff2c5e)
