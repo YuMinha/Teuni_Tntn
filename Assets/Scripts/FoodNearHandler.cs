@@ -21,7 +21,7 @@ public class FoodNearHandler : MonoBehaviour
     [SerializeField] TextMeshProUGUI TeachingText;  // Teaching Text
     [SerializeField] GameObject TeachingPanel; //Teaching UI
 
-    private Dictionary<string, int> coinCounts = new Dictionary<string, int>();
+    public static Dictionary<string, int> coinCounts = new Dictionary<string, int>();
     private Dictionary<string, List<string>> colorToClass = new Dictionary<string, List<string>>()
     {
         {"Green", new List<string>{ "Green Vegetables", "Green bell pepper", "broccoli", "lettuce", "spinach", "spring onion" } },

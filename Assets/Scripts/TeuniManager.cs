@@ -26,10 +26,10 @@ public class TeuniManager : MonoBehaviour
     public float Hp { get; set; } = 40;
 
 
-    public int RedCoin { get; set; } = 20;
-    public int WhiteCoin { get; set; } = 20;
-    public int GreenCoin { get; set; } = 20;
-    public int YellowCoin { get; set; } = 20;
+    public int RedCoin { get; set; } = 30;
+    public int WhiteCoin { get; set; } = 30;
+    public int GreenCoin { get; set; } = 30;
+    public int YellowCoin { get; set; } = 30;
 
     public int RedFood { get; set; } = 0;
     public int YellowFood { get; set; } = 0;
@@ -76,7 +76,7 @@ public class TeuniManager : MonoBehaviour
     {
         while (true) // 무한 반복
         {
-            yield return new WaitForSeconds(60);
+            yield return new WaitForSeconds(120);
 
             // HP 감소
             UpdateHP(-10);

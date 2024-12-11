@@ -40,5 +40,10 @@ public class FinishButton : MonoBehaviour
         {
             TeachingPanel.gameObject.SetActive(false);
         }
+
+        TeuniManager.Instance.RedCoin += FoodNearHandler.coinCounts["Red"];
+        TeuniManager.Instance.GreenCoin += FoodNearHandler.coinCounts["Green"];
+        TeuniManager.Instance.WhiteCoin += FoodNearHandler.coinCounts["White"];
+        TeuniManager.Instance.YellowCoin += FoodNearHandler.coinCounts["Yellow"];
     }
 }

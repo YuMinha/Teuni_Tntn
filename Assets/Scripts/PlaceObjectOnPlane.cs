@@ -3,17 +3,18 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System;
 
 public class PlaceObjectOnPlane : MonoBehaviour
 {
     private static PlaceObjectOnPlane instance;
     public static PlaceObjectOnPlane Instance
-    {  
-        get { return instance; } 
+    {
+        get { return instance; }
     }
 
-    public GameObject happyPrefab; 
-    public GameObject sadPrefab;   
+    public GameObject happyPrefab;
+    public GameObject sadPrefab;
     public GameObject neutralPrefab;
 
     private GameObject spawnedObject;
@@ -26,13 +27,17 @@ public class PlaceObjectOnPlane : MonoBehaviour
     private ARRaycastManager raycastManager; // AR Raycast Manager
     private List<ARRaycastHit> hits = new List<ARRaycastHit>(); // Raycast 결과 저장용 리스트
 
-    //public TeuniInven TeuniInven;
+    private DateTime lastUpdateTime; // 마지막 업데이트 시간
+    private float accumulatedTime = 0f; // 누적 경과 시간 
+    private readonly float neutralChangeThreshold = 2 * 60f; // 2분 데모용
+    //private readonly float neutralChangeThreshold = 30 * 60f; // 30분
+
     private float timer = 0f;
-    private bool timerActive = false; 
+    private bool timerActive = false;
 
     void Awake()
     {
-        if(null == instance)
+        if (null == instance)
         {
             instance = this;
         }
@@ -54,6 +59,52 @@ public class PlaceObjectOnPlane : MonoBehaviour
     {
         // TeuniManager의 HP 변경 이벤트 구독
         //TeuniManager.Instance.HPChanged += OnHPChanged;
+        // 저장된 누적 시간 및 마지막 업데이트 시간 로드
+        accumulatedTime = PlayerPrefs.GetFloat("AccumulatedTime", 0f);
+
+        string savedTime = PlayerPrefs.GetString("LastUpdateTime", "");
+        if (!string.IsNullOrEmpty(savedTime))
+        {
+            lastUpdateTime = DateTime.Parse(savedTime);
+
+            // 꺼져 있는 동안 경과한 시간 계산
+            TimeSpan elapsed = DateTime.Now - lastUpdateTime;
+            accumulatedTime += (float)elapsed.TotalSeconds; // 초 단위로 추가
+            Debug.Log($"누적 경과 시간: {accumulatedTime}초");
+        }
+        else
+        {
+            // 앱 처음 실행 시
+            lastUpdateTime = DateTime.Now;
+            Debug.Log("앱이 처음 실행되었습니다. 시간을 초기화합니다.");
+        }
+
+        // 30분 경과 확인
+        CheckForNeutralChange();
+    }
+
+    private void OnDestroy()
+    {
+        // 마지막 업데이트 시간 및 누적 시간 저장
+        PlayerPrefs.SetString("LastUpdateTime", DateTime.Now.ToString());
+        PlayerPrefs.SetFloat("AccumulatedTime", accumulatedTime);
+        PlayerPrefs.Save();
+    }
+
+    private void CheckForNeutralChange()
+    {
+        if (accumulatedTime >= neutralChangeThreshold)
+        {
+            isPoo = true;
+            // 30분 이상 경과 시 NeutralPrefab으로 변경
+            Debug.Log("30분 누적 경과: NeutralPrefab으로 변경합니다.");
+            PlaceNeutralPrefab();
+
+            // 누적 시간 초기화
+            accumulatedTime = 0f;
+            PlayerPrefs.SetFloat("AccumulatedTime", accumulatedTime);
+            PlayerPrefs.Save();
+        }
     }
 
     private void OnHPChanged(int newHP)
@@ -76,11 +127,21 @@ public class PlaceObjectOnPlane : MonoBehaviour
         if (TeuniManager.Instance.Hp == 40 || TeuniManager.Instance.Hp == 50 || TeuniManager.Instance.Hp == 100)
         {
             UpdateObjectBasedOnHP();
-            //Debug.Log("BasedOn");
+            Debug.Log("BasedOn");
         }
-        
+
+
         if (isObjectPlaced && timerActive)
         {
+
+            // 현재 실행 중인 시간 누적
+            accumulatedTime += Time.deltaTime;
+
+            // 30분 경과 여부 확인
+            CheckForNeutralChange();
+            Debug.Log(accumulatedTime);
+
+            /*
             timer += Time.deltaTime;
 
             // 타이머가 1분이 지나면 neutralPrefab을 현재 위치에 배치
@@ -89,7 +150,10 @@ public class PlaceObjectOnPlane : MonoBehaviour
                 isPoo = true;
                 PlaceNeutralPrefab();
             }
+            */
         }
+
+        lastUpdateTime = DateTime.Now;
     }
 
     private void HandleTouch(Touch touch)
@@ -108,19 +172,29 @@ public class PlaceObjectOnPlane : MonoBehaviour
 
             if (spawnedObject == null)
             {
-                GameObject prefabToSpawn = GetPrefabBasedOnHP();
+                GameObject prefabToSpawn;
+
+                if (accumulatedTime >= neutralChangeThreshold)
+                {
+                    prefabToSpawn = neutralPrefab;
+                    Debug.Log("30분 경과: NeutralPrefab 선택.");
+                }
+                else
+                {
+                    prefabToSpawn = GetPrefabBasedOnHP();
+                    Debug.Log("NeutralPrefab 조건 미충족: HP 기반 프리팹 선택.");
+                }
+
                 SetPrefabScale();
-                // 오브젝트 생성 및 배치
                 spawnedObject = Instantiate(prefabToSpawn, hitPose.position, hitPose.rotation);
                 spawnedObject.transform.localScale = teuniScale;
                 spawnedAnimator = spawnedObject.GetComponent<Animator>();
 
-                // y축으로 180도 추가 회전
                 spawnedObject.transform.rotation = hitPose.rotation * Quaternion.Euler(0, 180, 0);
 
-                isObjectPlaced = true; // 위치 고정
-                timerActive = true; 
-                Debug.Log("AR Object instantiated at: " + hitPose.position);
+                isObjectPlaced = true;
+                timerActive = true;
+                Debug.Log($"AR Object instantiated at: {hitPose.position}");
             }
         }
         else
@@ -142,20 +216,19 @@ public class PlaceObjectOnPlane : MonoBehaviour
             isMax = true;
             return;
         }
-        /*        if (TeuniManager.Instance.Hp < 100)
-                {
-                    if (!isMax) // 이전에 크기가 2배로 설정된 상태라면
-                    {
-                        teuniScale /= 2f; // 크기를 원래대로 되돌림
-                        isMax = true;
-                    }
-                    return;
-                }*/
 
         if (TeuniManager.Instance.Hp >= 100 && isMax)
         {
+            Vector3 sum = new Vector3(0.5f, 0.5f, 0.5f);
+            teuniScale += sum;
+            isMax = false;
+            Debug.Log($"증가");
+
+            /*
+            //데모용
             teuniScale *= 2f;
             isMax = false;
+            */
         }
     }
 
@@ -163,15 +236,15 @@ public class PlaceObjectOnPlane : MonoBehaviour
     {
         if (spawnedObject != null)
         {
-            Destroy(spawnedObject); 
+            Destroy(spawnedObject);
         }
         SetPrefabScale();
         spawnedObject = Instantiate(neutralPrefab, spawnedObject.transform.position, spawnedObject.transform.rotation);
         spawnedObject.transform.localScale = teuniScale;
         spawnedAnimator = spawnedObject.GetComponent<Animator>();
         Debug.Log("Neutral prefab placed at: " + spawnedObject.transform.position);
-        timer = 0f; 
-        timerActive = false; 
+        timer = 0f;
+        timerActive = false;
     }
 
     // HP 변경 메서드 (외부에서 호출 가능)
@@ -190,7 +263,7 @@ public class PlaceObjectOnPlane : MonoBehaviour
             GameObject prefabToSpawn = GetPrefabBasedOnHP();
             SetPrefabScale();
             // 현재 배치된 오브젝트와 새로운 오브젝트가 다르면 교체
-            if (spawnedObject.name != prefabToSpawn.name + "(Clone)") 
+            if (spawnedObject.name != prefabToSpawn.name + "(Clone)")
             {
                 Destroy(spawnedObject);
                 spawnedObject = Instantiate(prefabToSpawn, spawnedObject.transform.position, spawnedObject.transform.rotation);
@@ -200,7 +273,7 @@ public class PlaceObjectOnPlane : MonoBehaviour
                 timerActive = true;
             }
 
-            if(TeuniManager.Instance.Hp == 100)
+            if (TeuniManager.Instance.Hp == 100)
             {
                 spawnedObject.transform.localScale = teuniScale;
             }
@@ -214,7 +287,7 @@ public class PlaceObjectOnPlane : MonoBehaviour
             GameObject prefabToSpawn = GetPrefabBasedOnHP();
 
             // neutralPrefab 상태라면 오브젝트를 무조건 교체
-            if (spawnedObject.name == neutralPrefab.name + "(Clone)") 
+            if (spawnedObject.name == neutralPrefab.name + "(Clone)")
             {
                 Destroy(spawnedObject);
                 SetPrefabScale();
@@ -223,7 +296,7 @@ public class PlaceObjectOnPlane : MonoBehaviour
                 spawnedAnimator = spawnedObject.GetComponent<Animator>();
                 Debug.Log("AR Object updated to: " + prefabToSpawn.name);
 
-                timerActive = true; 
+                timerActive = true;
                 isPoo = false;
             }
 
@@ -238,7 +311,7 @@ public class PlaceObjectOnPlane : MonoBehaviour
             Destroy(spawnedObject);
             spawnedObject = null;
             isObjectPlaced = false; // 상태 초기화
-            timerActive = false; 
+            timerActive = false;
         }
         else
         {
