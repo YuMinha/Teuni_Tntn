@@ -40,7 +40,9 @@
 ## ‼️ 주요 기능
 **식사 기능**
   - Food Detection
-  - Face Tracking 
+  - Face Tracking
+
+
 **트니 키우기(육성 게임)**
   - AR 환경 캐릭터 증강
   - 밥 먹이기 기능
