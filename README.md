@@ -68,4 +68,4 @@
 
 
 ## 🚺 팀 구성원 및 업무 분장
-
+![image](https://github.com/user-attachments/assets/2104fd4b-20f1-4010-91de-7353b6773281)
