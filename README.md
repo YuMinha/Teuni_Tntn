@@ -58,6 +58,9 @@
 **트니**
 
 ## 📁 활용한 오픈소스
+푸드
+페이스
+팝업
 
 ## 📆 간트차트
 [간트차트](https://docs.google.com/spreadsheets/d/1sI_NgvYk_Caa1orUv7VdfLQT312MnowifQc110wyLYY/edit?gid=0#gid=0)
