@@ -62,8 +62,6 @@
 ## 📆 간트차트
 [간트차트](https://docs.google.com/spreadsheets/d/1sI_NgvYk_Caa1orUv7VdfLQT312MnowifQc110wyLYY/edit?gid=0#gid=0)
 
-![image](https://github.com/user-attachments/assets/0246f5d9-cb94-4fc1-8f68-8a2aa4e8215d)
-
 
 ## 🚺 팀 구성원 및 업무 분장
 
