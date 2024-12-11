@@ -31,6 +31,9 @@
 ## 📼 시연 영상 
 - 영상
 ## 📚 개발 배경
+<p align="center">
+  <img src="![image](https://github.com/user-attachments/assets/5e05fcff-8047-49e9-9b10-6ff78f541a51)">
+</p>
 ![image](https://github.com/user-attachments/assets/5e05fcff-8047-49e9-9b10-6ff78f541a51)
 ## 🔘 전체 시스템 구성
 ![image](https://github.com/user-attachments/assets/857cf482-1227-48ea-9ed0-0b7be5ff2c5e)
